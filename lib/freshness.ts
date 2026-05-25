@@ -204,6 +204,7 @@ export async function isOrderStale(order: {
   if (order.salaryAsOfDate) {
     const maxDate = await getMaxSalaryEffectiveDate(order.employeeId)
     const asOf = parseDate(order.salaryAsOfDate)
+    console.log(`[DEBUG isOrderStale#${order.id}] Check1: salaryAsOfDate=${order.salaryAsOfDate}, asOf=${asOf}, maxDate=${maxDate?.toISOString()}, asOf<maxDate=${asOf && maxDate ? asOf < maxDate : 'N/A'}`)
     if (maxDate && asOf && asOf < maxDate) {
       result.statusSalary = "stale"
     }
@@ -212,6 +213,7 @@ export async function isOrderStale(order: {
   // Check 2: level
   if (order.positionLevel) {
     const current = await getCurrentLevel(order.employeeId, order.id)
+    console.log(`[DEBUG isOrderStale#${order.id}] Check2: orderLevel=${order.positionLevel}, currentLevel=${current}, match=${order.positionLevel === current}`)
     if (current && order.positionLevel !== current) {
       result.statusLevel = "stale"
     }
@@ -250,14 +252,18 @@ export async function isOrderStale(order: {
   if (order.salaryAsOfDate) {
     const adjs = await getApplicableAdjustments(order.employeeId)
     const asOf = parseDate(order.salaryAsOfDate)
+    console.log(`[DEBUG isOrderStale#${order.id}] Check6: adjsCount=${adjs.length}`)
     for (const adj of adjs) {
       const adjDate = parseDate(adj.adjustment.adjustDate)
+      console.log(`[DEBUG isOrderStale#${order.id}] Check6: adjDate=${adjDate?.toISOString()}, asOf<adjDate=${asOf && adjDate ? asOf < adjDate : 'N/A'}`)
       if (adjDate && asOf && asOf < adjDate) {
         result.statusSalary = "stale"
         break
       }
     }
   }
+
+  console.log(`[DEBUG isOrderStale#${order.id}] Result: statusSalary=${result.statusSalary}, statusLevel=${result.statusLevel}, statusPosition=${result.statusPosition}, statusType=${result.statusType}, statusOrg=${result.statusOrg}`)
 
   result.overallStatus =
     result.statusSalary === "stale" ||

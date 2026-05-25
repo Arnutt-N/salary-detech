@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { test, describe, before } from "node:test"
 import assert from "node:assert"
 import { seedApiDb } from "../fixtures/seed-api"
