@@ -40,6 +40,9 @@ export async function POST(
         effectiveDate: true,
         statusSalary: true,
         statusLevel: true,
+        statusPosition: true,
+        statusType: true,
+        statusOrg: true,
       },
     })
 
@@ -51,7 +54,10 @@ export async function POST(
       if (mode === "clean") {
         const isStale =
           order.statusSalary === "stale" ||
-          order.statusLevel === "stale"
+          order.statusLevel === "stale" ||
+          order.statusPosition === "stale" ||
+          order.statusType === "stale" ||
+          order.statusOrg === "stale"
         if (isStale) continue
       }
 
