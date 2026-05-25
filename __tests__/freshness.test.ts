@@ -171,20 +171,38 @@ describe("validateOrderFreshness", () => {
 })
 
 describe("cascadeStaleCheck", () => {
-  test("returns affected orders array", async () => {
-    const result = await cascadeStaleCheck(personId, "2569-04-01")
-    assert.ok(Array.isArray(result))
+  test("returns number for existing order", async () => {
+    // Create a stale order first
+    const order = await prisma.order.create({
+      data: {
+        employeeId: personId,
+        orderType: "salary_apr",
+        issueDate: "2569-04-01",
+        effectiveDate: "2569-04-01",
+        salary: 30000, // different from current 25000
+        orderStatus: "active",
+        statusSalary: "stale",
+      },
+    })
+
+    const result = await cascadeStaleCheck(order.id)
+    // cascadeStaleCheck returns Promise<number>
+    assert.ok(typeof result === "number")
   })
 
-  test("respects max_depth limit", async () => {
-    const result = await cascadeStaleCheck(personId, "2569-04-01", 1)
-    // max_depth=1 means cascade at most 1 level deep
-    // Result is an array of affected order IDs
-    assert.ok(Array.isArray(result))
+  test("cascade respects maxDepth", async () => {
+    const order = await prisma.order.findFirst({
+      where: { employeeId: personId, orderStatus: "active" },
+    })
+    assert.ok(order)
+
+    const result = await cascadeStaleCheck(order!.id, new Set(), 0, 2)
+    // With depth=0 and maxDepth=2, returns number of cascaded orders
+    assert.ok(typeof result === "number")
   })
 
-  test("returns empty for non-existent person", async () => {
-    const result = await cascadeStaleCheck(999999, "2569-01-01")
-    assert.strictEqual(result.length, 0)
+  test("returns 0 for non-existent order", async () => {
+    const result = await cascadeStaleCheck(999999)
+    assert.strictEqual(result, 0)
   })
 })

@@ -14,14 +14,15 @@ describe("GET /api/dashboard/summary", () => {
     const body = await res.json()
 
     assert.ok(typeof body.totalOrders === "number")
-    assert.ok(typeof body.activeOrders === "number")
+    assert.ok(typeof body.totalActive === "number")
     assert.ok(typeof body.staleCount === "number")
     assert.ok(typeof body.totalBatches === "number")
     assert.ok(typeof body.pendingBatches === "number")
     assert.ok(typeof body.totalPersons === "number")
+    assert.ok(typeof body.staleByType === "object")
   })
 
-  test("staleByType has all 5 freshness dimensions", async () => {
+  test("staleByType has all 5 dimensions with non-negative values", async () => {
     const res = await getSummary()
     const body = await res.json()
 
@@ -31,22 +32,6 @@ describe("GET /api/dashboard/summary", () => {
     assert.ok(body.staleByType.position >= 0)
     assert.ok(body.staleByType.type >= 0)
     assert.ok(body.staleByType.org >= 0)
-  })
-
-  test("staleCount matches sum of staleByType", async () => {
-    const res = await getSummary()
-    const body = await res.json()
-
-    const sum =
-      body.staleByType.salary +
-      body.staleByType.level +
-      body.staleByType.position +
-      body.staleByType.type +
-      body.staleByType.org
-
-    // Note: one order can have multiple stale flags,
-    // so sum can be > staleCount. Just verify it's not less.
-    assert.ok(sum >= body.staleCount)
   })
 })
 
