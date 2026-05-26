@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
   ])
 
   // Avoid groupBy (Prisma 7 libSQL compatibility) — fetch stale counts in one query
-  const personIds = persons.map((p) => p.id)
+  const personIds = persons.map((p: typeof persons[number]) => p.id)
   const staleOrders =
     personIds.length > 0
       ? await prisma.order.findMany({
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
     staleMap.set(o.employeeId, (staleMap.get(o.employeeId) ?? 0) + 1)
   }
 
-  const enriched = persons.map((p) => ({
+  const enriched = persons.map((p: typeof persons[number]) => ({
     id: p.id,
     nameTitle: p.nameTitle,
     firstName: p.firstName,

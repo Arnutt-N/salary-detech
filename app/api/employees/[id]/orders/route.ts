@@ -30,7 +30,7 @@ export async function GET(
     },
   })
 
-  const enriched = orders.map((o) => {
+  const enriched = orders.map((o: typeof orders[number]) => {
     const isStale =
       o.statusSalary === "stale" ||
       o.statusLevel === "stale" ||
