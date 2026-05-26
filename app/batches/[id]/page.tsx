@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import { BatchActions } from "./BatchActions"
+import type { OrderWithPersonMinimal } from "@/lib/types"
 
 export default async function BatchDetailPage({
   params,
@@ -29,6 +30,8 @@ export default async function BatchDetailPage({
   })
 
   if (!batch) notFound()
+
+  const orders = batch.orders as OrderWithPersonMinimal[]
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -63,7 +66,7 @@ export default async function BatchDetailPage({
             </tr>
           </thead>
           <tbody>
-            {batch.orders.map((o) => {
+            {orders.map((o) => {
               const staleFlags = [
                 o.statusSalary,
                 o.statusLevel,

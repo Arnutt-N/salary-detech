@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import type { OrderWithPerson } from "@/lib/types"
 
 export async function GET(
   _request: NextRequest,
@@ -8,7 +9,7 @@ export async function GET(
   const { id: idStr } = await params
   const id = parseInt(idStr)
 
-  const orders = await prisma.order.findMany({
+  const orders = (await prisma.order.findMany({
     where: { employeeId: id },
     orderBy: { effectiveDate: "desc" },
     select: {
@@ -28,9 +29,9 @@ export async function GET(
       positionType: true,
       positionLevel: true,
     },
-  })
+  })) as OrderWithPerson[]
 
-  const enriched = orders.map((o: typeof orders[number]) => {
+  const enriched = orders.map((o) => {
     const isStale =
       o.statusSalary === "stale" ||
       o.statusLevel === "stale" ||

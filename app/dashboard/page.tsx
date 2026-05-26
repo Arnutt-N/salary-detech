@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import type { OrderWithPerson } from "@/lib/types"
 
 const typeLabel: Record<string, string> = {
   salary_apr: "เลื่อนเงินเดือน 1 เม.ย.",
@@ -39,7 +40,7 @@ export default async function DashboardPage() {
   ])
 
   // Recent activity (10 most recent)
-  const recentOrders = await prisma.order.findMany({
+  const recentOrders = (await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
     take: 10,
     select: {
@@ -51,10 +52,10 @@ export default async function DashboardPage() {
       createdAt: true,
       person: { select: { id: true, firstName: true, lastName: true } },
     },
-  })
+  })) as OrderWithPerson[]
 
   // Stale orders (limited to 30 to avoid timeout — critical fix #2)
-  const staleOrders = await prisma.order.findMany({
+  const staleOrders = (await prisma.order.findMany({
     where: staleWhere,
     orderBy: [{ employeeId: "asc" }, { effectiveDate: "desc" }],
     take: 30,
@@ -71,7 +72,7 @@ export default async function DashboardPage() {
       statusOrg: true,
       person: { select: { firstName: true, lastName: true } },
     },
-  })
+  })) as OrderWithPerson[]
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-8">

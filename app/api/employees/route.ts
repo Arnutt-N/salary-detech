@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import type { PersonWithCount } from "@/lib/types"
 
 const PAGE_SIZE = 50
 
@@ -42,12 +43,12 @@ export async function GET(request: NextRequest) {
         isActive: true,
         _count: { select: { orders: true } },
       },
-    }),
+    }) as Promise<PersonWithCount[]>,
     prisma.person.count({ where }),
   ])
 
   // Avoid groupBy (Prisma 7 libSQL compatibility) — fetch stale counts in one query
-  const personIds = persons.map((p: typeof persons[number]) => p.id)
+  const personIds = persons.map((p) => p.id)
   const staleOrders =
     personIds.length > 0
       ? await prisma.order.findMany({
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
     staleMap.set(o.employeeId, (staleMap.get(o.employeeId) ?? 0) + 1)
   }
 
-  const enriched = persons.map((p: typeof persons[number]) => ({
+  const enriched = persons.map((p) => ({
     id: p.id,
     nameTitle: p.nameTitle,
     firstName: p.firstName,

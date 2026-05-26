@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import type { OrderWithPerson, ChangeLogWithOrder } from "@/lib/types"
 
 const typeLabel: Record<string, string> = {
   salary_apr: "เลื่อนเงินเดือน 1 เม.ย.",
@@ -59,7 +60,7 @@ export default async function EmployeeDetailPage({
   if (!person) notFound()
 
   // Order timeline
-  const orders = await prisma.order.findMany({
+  const orders = (await prisma.order.findMany({
     where: { employeeId: id },
     orderBy: { effectiveDate: "desc" },
     select: {
@@ -77,10 +78,10 @@ export default async function EmployeeDetailPage({
       salary: true,
       positionName: true,
     },
-  })
+  })) as OrderWithPerson[]
 
   // Change log (last 20)
-  const changes = await prisma.employeeChangeLog.findMany({
+  const changes = (await prisma.employeeChangeLog.findMany({
     where: { employeeId: id },
     orderBy: { createdAt: "desc" },
     take: 20,
@@ -95,7 +96,7 @@ export default async function EmployeeDetailPage({
         select: { id: true, orderNo: true, orderType: true },
       },
     },
-  })
+  })) as ChangeLogWithOrder[]
 
   // Stale count
   const staleCount = await prisma.order.count({
