@@ -33,8 +33,8 @@ interface OrderData {
   department: string | null
   ministry: string | null
   person: {
-    firstName: string
-    lastName: string
+    firstName: string | null
+    lastName: string | null
   }
 }
 

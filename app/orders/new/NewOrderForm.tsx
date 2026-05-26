@@ -19,16 +19,16 @@ const typeOptions = [
 
 interface Person {
   id: number
-  firstName: string
-  lastName: string
-  currentPositionName?: string
-  currentPositionType?: string
-  currentPositionLevel?: string
-  currentBureau?: string
-  currentDivision?: string
-  currentDepartment?: string
-  currentMinistry?: string
-  currentSalary?: number
+  firstName: string | null
+  lastName: string | null
+  currentPositionName?: string | null
+  currentPositionType?: string | null
+  currentPositionLevel?: string | null
+  currentBureau?: string | null
+  currentDivision?: string | null
+  currentDepartment?: string | null
+  currentMinistry?: string | null
+  currentSalary?: number | null
 }
 
 interface PreviewResult {
