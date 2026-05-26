@@ -43,7 +43,7 @@ export default async function EmployeesPage({
   ])
 
   // Stale count — findMany + manual count (avoids groupBy compatibility)
-  const ids = persons.map((p) => p.id)
+  const ids = (persons as EmployeeRow[]).map((p) => p.id)
   const staleOrders =
     ids.length > 0
       ? await prisma.order.findMany({
@@ -69,7 +69,7 @@ export default async function EmployeesPage({
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
-  const tableData: EmployeeRow[] = persons.map((p) => ({
+  const tableData: EmployeeRow[] = (persons as EmployeeRow[]).map((p) => ({
     id: p.id,
     nameTitle: p.nameTitle,
     firstName: p.firstName,

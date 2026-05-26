@@ -75,7 +75,7 @@ export default async function AuditReportPage({
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
-  const tableData: AuditRow[] = changes.map((c) => ({
+  const tableData: AuditRow[] = (changes as AuditRow[]).map((c) => ({
     id: c.id,
     createdAt: c.createdAt.toISOString(),
     changeType: c.changeType,
