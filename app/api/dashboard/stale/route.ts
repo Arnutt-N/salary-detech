@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     prisma.order.count({ where }),
   ])
 
-  const enriched = orders.map((o) => {
+  const enriched = orders.map((o: typeof orders[number]) => {
     const warnings: string[] = []
     if (o.statusSalary === "stale") warnings.push("⚠️ เงินเดือนไม่ล่าสุด")
     if (o.statusLevel === "stale") warnings.push("⚠️ ระดับตำแหน่งไม่ล่าสุด")
