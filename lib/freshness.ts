@@ -70,7 +70,11 @@ export async function getMaxSalaryEffectiveDate(
     },
     select: { effectiveDate: true },
   })
-  results.push(...salaryOrders.map((o) => parseDate(o.effectiveDate)))
+  results.push(
+    ...salaryOrders.map((o: { effectiveDate: string | null }) =>
+      parseDate(o.effectiveDate)
+    )
+  )
 
   // (b) promotion orders (change calculation base)
   const promotions = await prisma.order.findMany({
@@ -81,7 +85,11 @@ export async function getMaxSalaryEffectiveDate(
     },
     select: { effectiveDate: true },
   })
-  results.push(...promotions.map((o) => parseDate(o.effectiveDate)))
+  results.push(
+    ...promotions.map((o: { effectiveDate: string | null }) =>
+      parseDate(o.effectiveDate)
+    )
+  )
 
   // (c) system-wide adjustments
   const adjustments = await prisma.salaryAdjustmentApplicant.findMany({
@@ -89,7 +97,9 @@ export async function getMaxSalaryEffectiveDate(
     select: { adjustment: { select: { adjustDate: true } } },
   })
   results.push(
-    ...adjustments.map((a) => parseDate(a.adjustment.adjustDate))
+    ...adjustments.map((a: { adjustment: { adjustDate: string | null } }) =>
+      parseDate(a.adjustment.adjustDate)
+    )
   )
 
   // (d) education adjustments
@@ -97,14 +107,22 @@ export async function getMaxSalaryEffectiveDate(
     where: { employeeId },
     select: { councilApprovalDate: true },
   })
-  results.push(...edu.map((e) => parseDate(e.councilApprovalDate)))
+  results.push(
+    ...edu.map((e: { councilApprovalDate: string | null }) =>
+      parseDate(e.councilApprovalDate)
+    )
+  )
 
   // (e) S5 compensation-to-salary
   const comps = await prisma.compensationToSalary.findMany({
     where: { employeeId },
     select: { effectiveDate: true },
   })
-  results.push(...comps.map((c) => parseDate(c.effectiveDate)))
+  results.push(
+    ...comps.map((c: { effectiveDate: string | null }) =>
+      parseDate(c.effectiveDate)
+    )
+  )
 
   const valid = results.filter((d): d is Date => d !== null)
   if (valid.length === 0) return null

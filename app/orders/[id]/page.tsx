@@ -69,10 +69,10 @@ export default async function OrderDetailPage({
     : null
 
   // Fetch orders that this order corrected (reverse lookup)
-  const correctedOrders = await prisma.order.findMany({
+  const correctedOrders = (await prisma.order.findMany({
     where: { correctedFrom: orderId },
     select: { id: true, orderNo: true, orderType: true },
-  })
+  })) as Array<{ id: number; orderNo: string | null; orderType: string }>
 
   const field = (label: string, value?: string | number | null) => (
     <div>
