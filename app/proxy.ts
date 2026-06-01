@@ -5,7 +5,6 @@ export default auth((req) => {
   const { nextUrl } = req
   const isLoggedIn = !!req.auth
 
-  // Public paths that don't require auth
   const isPublic =
     nextUrl.pathname === "/login" ||
     nextUrl.pathname.startsWith("/api/auth")
@@ -25,7 +24,6 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    // Skip static files, images, favicon
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 }
