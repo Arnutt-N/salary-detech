@@ -15,7 +15,7 @@
 |-------|-------|
 | **Frontend** | Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + shadcn/ui |
 | **Backend** | Next.js API Routes + Prisma ORM |
-| **Database** | TiDB Cloud (MySQL-compatible) |
+| **Database** | Turso (libSQL) + Prisma 7 + @prisma/adapter-libsql |
 | **Auth** | Auth.js (NextAuth v5) |
 | **State/Table** | TanStack Table v8 + React Hook Form |
 | **Validation** | Zod |
@@ -49,7 +49,7 @@
 - [x] Auth.js configured (credentials provider for ขรก. login)
 - [x] Base layout (sidebar nav + header) with role-based access
 - [x] Thai date utility (พ.ศ. formatting with date-fns + 543)
-- [ ] Sentry initialized (deferred — requires npm install)
+- [x] Sentry initialized (DSN via SENTRY_DSN env var, server + client configs)
 - [x] Sonner toast provider
 
 ### Key Files
