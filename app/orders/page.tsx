@@ -62,7 +62,7 @@ export default async function OrdersPage({
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
-  const tableData: OrderRow[] = orders.map((o: any) => ({
+  const tableData: OrderRow[] = orders.map((o) => ({
     id: o.id,
     orderType: o.orderType,
     orderNo: o.orderNo,

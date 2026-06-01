@@ -51,7 +51,7 @@ export default async function StaleReportPage({
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
-  const tableData: StaleRow[] = orders.map((o: any) => ({
+  const tableData: StaleRow[] = orders.map((o) => ({
     id: o.id,
     orderType: o.orderType,
     personId: o.person?.id ?? null,

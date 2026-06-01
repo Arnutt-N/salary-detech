@@ -10,8 +10,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // TODO: Replace with real authentication
-        if (credentials?.username === "admin" && credentials?.password === "password") {
+        const adminUser = process.env.ADMIN_USERNAME || "admin"
+        const adminPass = process.env.ADMIN_PASSWORD
+        if (!adminPass) {
+          console.error("[auth] ADMIN_PASSWORD not set — denying all logins")
+          return null
+        }
+        if (credentials?.username === adminUser && credentials?.password === adminPass) {
           return { id: "1", name: "ผู้ดูแลระบบ", role: "admin" }
         }
         return null
