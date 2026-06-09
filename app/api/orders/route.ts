@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { validateOrderFreshness, cascadeStaleCheck } from "@/lib/freshness"
+import { orderInputToCreateData, type OrderInputBody } from "@/lib/order-payload"
+import { orderSchema } from "@/lib/validation/order-schema"
 
 // GET /api/orders — list orders
 export async function GET(request: NextRequest) {
@@ -40,28 +42,21 @@ export async function GET(request: NextRequest) {
 // POST /api/orders — create new order
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    const body = (await request.json()) as OrderInputBody & { orderStatus?: string }
+
+    const parsed = orderSchema.safeParse({
+      ...body,
+      employeeId: body.employeeId,
+    })
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      )
+    }
 
     const order = await prisma.order.create({
-      data: {
-        employeeId: body.employeeId,
-        batchId: body.batchId ?? null,
-        orderType: body.orderType,
-        orderNo: body.orderNo ?? null,
-        issueDate: body.issueDate,
-        effectiveDate: body.effectiveDate,
-        salary: body.salary ?? null,
-        salaryAsOfDate: body.salaryAsOfDate ?? null,
-        salarySystemType: body.salarySystemType ?? null,
-        positionName: body.positionName ?? null,
-        positionType: body.positionType ?? null,
-        positionLevel: body.positionLevel ?? null,
-        bureau: body.bureau ?? null,
-        division: body.division ?? null,
-        department: body.department ?? null,
-        ministry: body.ministry ?? null,
-        orderStatus: body.orderStatus ?? "active",
-      },
+      data: orderInputToCreateData(body),
     })
 
     // Run freshness check + cascade on activation
@@ -75,7 +70,7 @@ export async function POST(request: Request) {
     if (order.orderStatus === "active") {
       await prisma.employeeChangeLog.create({
         data: {
-          employeeId: body.employeeId,
+          employeeId: order.employeeId,
           changeType: body.orderType === "salary_increase" || body.orderType === "special_salary"
             ? "salary"
             : body.orderType === "promotion"
@@ -83,7 +78,7 @@ export async function POST(request: Request) {
             : body.orderType === "transfer"
             ? "org"
             : "position",
-          effectiveDate: body.effectiveDate,
+          effectiveDate: order.effectiveDate,
           orderId: order.id,
           newValue: JSON.stringify({
             position_name: body.positionName,

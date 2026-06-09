@@ -5,6 +5,19 @@ import type { PersonListItem } from "@/lib/types"
 
 const PAGE_SIZE = 50
 
+function buildSearchWhere(search: string): Record<string, unknown> {
+  if (!search) return {}
+  const digitSearch = search.replace(/\D/g, "")
+  const or: Record<string, unknown>[] = [
+    { firstName: { contains: search } },
+    { lastName: { contains: search } },
+  ]
+  if (digitSearch.length >= 4) {
+    or.push({ citizenId: { contains: digitSearch } })
+  }
+  return { OR: or }
+}
+
 export default async function EmployeesPage({
   searchParams,
 }: {
@@ -13,13 +26,7 @@ export default async function EmployeesPage({
   const currentPage = parseInt(searchParams.page || "1")
   const search = searchParams.search || ""
 
-  const where: Record<string, unknown> = {}
-  if (search) {
-    where.OR = [
-      { firstName: { contains: search } },
-      { lastName: { contains: search } },
-    ]
-  }
+  const where: Record<string, unknown> = buildSearchWhere(search)
 
   const [persons, total] = await Promise.all([
     prisma.person.findMany({
@@ -32,6 +39,7 @@ export default async function EmployeesPage({
         nameTitle: true,
         firstName: true,
         lastName: true,
+        citizenId: true,
         currentPositionName: true,
         currentPositionType: true,
         currentPositionLevel: true,
@@ -75,6 +83,7 @@ export default async function EmployeesPage({
     nameTitle: p.nameTitle,
     firstName: p.firstName,
     lastName: p.lastName,
+    citizenId: p.citizenId ?? null,
     currentPositionName: p.currentPositionName,
     currentPositionType: p.currentPositionType,
     currentPositionLevel: p.currentPositionLevel,
@@ -86,13 +95,21 @@ export default async function EmployeesPage({
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">👥 ข้าราชการทั้งหมด</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">👥 ข้าราชการทั้งหมด</h1>
+        <Link
+          href="/employees/new"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+        >
+          ➕ เพิ่มข้าราชการ
+        </Link>
+      </div>
 
       <form className="mb-4 flex gap-2">
         <input
           name="search"
           defaultValue={search}
-          placeholder="ค้นหาชื่อ-นามสกุล..."
+          placeholder="ค้นหาชื่อ-นามสกุล หรือเลขบัตรประชาชน..."
           className="flex-1 px-3 py-2 border rounded-lg text-sm"
         />
         <button
@@ -113,6 +130,12 @@ export default async function EmployeesPage({
           <p className="text-sm mt-1">
             เริ่มต้นด้วยการเพิ่มข้อมูลข้าราชการในระบบ
           </p>
+          <Link
+            href="/employees/new"
+            className="inline-block mt-4 text-blue-600 hover:underline text-sm"
+          >
+            ➕ เพิ่มข้าราชการคนแรก
+          </Link>
         </div>
       ) : (
         <EmployeesTable data={tableData} />

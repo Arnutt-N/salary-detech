@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { EmployeeOrderResult, ChangeLogWithOrder } from "@/lib/types"
+import { formatCitizenId } from "@/lib/citizen-id"
 
 const typeLabel: Record<string, string> = {
   salary_apr: "เลื่อนเงินเดือน 1 เม.ย.",
@@ -29,9 +30,10 @@ const fieldLabel: Record<string, string> = {
 export default async function EmployeeDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const id = parseInt(params.id)
+  const { id: idStr } = await params
+  const id = parseInt(idStr)
 
   const person = await prisma.person.findUnique({
     where: { id },
@@ -142,21 +144,27 @@ export default async function EmployeeDetailPage({
             <h1 className="text-2xl font-bold">
               {person.nameTitle} {person.firstName} {person.lastName}
             </h1>
-            {person.citizenId && (
-              <p className="text-sm text-zinc-400 font-mono mt-1">
-                เลขบัตร: {person.citizenId}
-              </p>
-            )}
+            <p className="text-sm text-zinc-400 font-mono mt-1">
+              เลขบัตร: {formatCitizenId(person.citizenId)}
+            </p>
           </div>
-          <span
-            className={`text-xs px-3 py-1 rounded-full ${
-              person.isActive
-                ? "bg-green-50 text-green-700"
-                : "bg-gray-100 text-gray-600"
-            }`}
-          >
-            {person.isActive ? "🟢 ประจำการ" : "⚪ ไม่ประจำการ"}
-          </span>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/employees/${person.id}/edit`}
+              className="text-sm px-3 py-1 border rounded-lg hover:bg-zinc-50"
+            >
+              ✏️ แก้ไข
+            </Link>
+            <span
+              className={`text-xs px-3 py-1 rounded-full ${
+                person.isActive
+                  ? "bg-green-50 text-green-700"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              {person.isActive ? "🟢 ประจำการ" : "⚪ ไม่ประจำการ"}
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">

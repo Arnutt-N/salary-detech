@@ -2,8 +2,8 @@
 import { test, describe, before } from "node:test"
 import assert from "node:assert"
 import { seedApiDb } from "../fixtures/seed-api"
-import { GET as getEmployees } from "../../app/api/employees/route"
-import { GET as getEmployeeById } from "../../app/api/employees/[id]/route"
+import { GET as getEmployees, POST as postEmployee } from "../../app/api/employees/route"
+import { GET as getEmployeeById, PUT as putEmployee } from "../../app/api/employees/[id]/route"
 
 let personIds: number[]
 
@@ -50,6 +50,15 @@ describe("GET /api/employees", () => {
       assert.strictEqual(p.isActive, true)
     })
   })
+
+  test("search filters by citizenId digits", async () => {
+    const req = new Request("http://localhost/api/employees?search=1100200300401")
+    const res = await getEmployees(req as any)
+    const body = await res.json()
+
+    assert.ok(body.total >= 1)
+    assert.strictEqual(body.persons[0].citizenId, "1100200300401")
+  })
 })
 
 describe("GET /api/employees/[id]", () => {
@@ -80,5 +89,63 @@ describe("GET /api/employees/[id]", () => {
     assert.strictEqual(res.status, 404)
     const body = await res.json()
     assert.ok(body.error)
+  })
+})
+
+describe("POST /api/employees", () => {
+  test("creates person with citizenId", async () => {
+    const req = new Request("http://localhost/api/employees", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        citizenId: "9999999999999",
+        firstName: "ใหม่",
+        lastName: "ทดสอบ",
+        isActive: true,
+      }),
+    })
+    const res = await postEmployee(req)
+    const body = await res.json()
+
+    assert.strictEqual(res.status, 201)
+    assert.strictEqual(body.citizenId, "9999999999999")
+    assert.strictEqual(body.firstName, "ใหม่")
+  })
+
+  test("rejects duplicate citizenId", async () => {
+    const req = new Request("http://localhost/api/employees", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        citizenId: "1100200300401",
+        firstName: "ซ้ำ",
+        lastName: "เลขบัตร",
+        isActive: true,
+      }),
+    })
+    const res = await postEmployee(req)
+    assert.strictEqual(res.status, 409)
+  })
+})
+
+describe("PUT /api/employees/[id]", () => {
+  test("updates person citizenId", async () => {
+    const req = new Request(`http://localhost/api/employees/${personIds[4]}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        citizenId: "8888888888888",
+        firstName: "ทดสอบ5",
+        lastName: "นามสกุล5",
+        isActive: true,
+      }),
+    })
+    const res = await putEmployee(req, {
+      params: Promise.resolve({ id: String(personIds[4]) }) as any,
+    })
+    const body = await res.json()
+
+    assert.strictEqual(res.status, 200)
+    assert.strictEqual(body.citizenId, "8888888888888")
   })
 })

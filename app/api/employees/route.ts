@@ -1,8 +1,42 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import type { PersonWithCount } from "@/lib/types"
+import { personSchema, personFormToApiBody } from "@/lib/validation/person-schema"
 
 const PAGE_SIZE = 50
+
+function buildSearchWhere(search: string): Record<string, unknown> {
+  if (!search) return {}
+  const digitSearch = search.replace(/\D/g, "")
+  const or: Record<string, unknown>[] = [
+    { firstName: { contains: search } },
+    { lastName: { contains: search } },
+  ]
+  if (digitSearch.length >= 4) {
+    or.push({ citizenId: { contains: digitSearch } })
+  }
+  return { OR: or }
+}
+
+async function assertUniqueCitizenId(citizenId: string | null, excludeId?: number) {
+  if (!citizenId) return null
+  const existing = await prisma.person.findFirst({
+    where: {
+      citizenId,
+      ...(excludeId ? { id: { not: excludeId } } : {}),
+    },
+    select: { id: true, firstName: true, lastName: true },
+  })
+  if (existing) {
+    return NextResponse.json(
+      {
+        error: `เลขบัตรนี้มีในระบบแล้ว (${existing.firstName} ${existing.lastName})`,
+      },
+      { status: 409 }
+    )
+  }
+  return null
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -10,13 +44,7 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get("search") || ""
   const active = searchParams.get("active")
 
-  const where: Record<string, unknown> = {}
-  if (search) {
-    where.OR = [
-      { firstName: { contains: search } },
-      { lastName: { contains: search } },
-    ]
-  }
+  const where: Record<string, unknown> = buildSearchWhere(search)
   if (active === "true") where.isActive = true
   if (active === "false") where.isActive = false
 
@@ -91,4 +119,30 @@ export async function GET(request: NextRequest) {
   }))
 
   return NextResponse.json({ persons: enriched, total, page, limit: PAGE_SIZE })
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const parsed = personSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      )
+    }
+
+    const data = personFormToApiBody(parsed.data)
+    const conflict = await assertUniqueCitizenId(data.citizenId ?? null)
+    if (conflict) return conflict
+
+    const person = await prisma.person.create({ data })
+
+    return NextResponse.json(person, { status: 201 })
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create person", detail: String(error) },
+      { status: 500 }
+    )
+  }
 }

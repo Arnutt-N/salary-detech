@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { validateOrderFreshness, cascadeStaleCheck } from "@/lib/freshness"
+import { orderInputToUpdateData, type OrderInputBody } from "@/lib/order-payload"
+import { orderSchema } from "@/lib/validation/order-schema"
 
 export async function GET(
   _request: Request,
@@ -120,14 +122,12 @@ export async function PUT(
   try {
     const { id } = await params
     const orderId = parseInt(id)
-    const body = await request.json()
 
     const order = await prisma.order.findUnique({ where: { id: orderId } })
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 })
     }
 
-    // Only draft or active orders can be edited
     if (!["draft", "active"].includes(order.orderStatus)) {
       return NextResponse.json(
         { error: `Cannot edit order with status '${order.orderStatus}'` },
@@ -135,24 +135,22 @@ export async function PUT(
       )
     }
 
-    // Update order fields only (not status, correction chain)
+    const body = (await request.json()) as OrderInputBody
+
+    const parsed = orderSchema.safeParse({
+      ...body,
+      employeeId: order.employeeId,
+    })
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      )
+    }
+
     const updated = await prisma.order.update({
       where: { id: orderId },
-      data: {
-        orderNo: body.orderNo ?? order.orderNo,
-        orderType: body.orderType ?? order.orderType,
-        issueDate: body.issueDate ?? order.issueDate,
-        effectiveDate: body.effectiveDate ?? order.effectiveDate,
-        salary: body.salary ?? order.salary,
-        salaryAsOfDate: body.salaryAsOfDate ?? order.salaryAsOfDate,
-        positionName: body.positionName ?? order.positionName,
-        positionType: body.positionType ?? order.positionType,
-        positionLevel: body.positionLevel ?? order.positionLevel,
-        bureau: body.bureau ?? order.bureau,
-        division: body.division ?? order.division,
-        department: body.department ?? order.department,
-        ministry: body.ministry ?? order.ministry,
-      },
+      data: orderInputToUpdateData(body, order as OrderInputBody),
     })
 
     // Re-run freshness check if active

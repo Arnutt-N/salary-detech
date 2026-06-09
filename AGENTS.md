@@ -47,7 +47,9 @@ Domain spec: `hr-order-freshness-check-v2.md`. Roadmap: `PRP.md`.
 - **EmployeeChangeLog**: source of truth for current level/position/org after active orders.
 - **Freshness engine** (`lib/freshness.ts`): `isOrderStale`, `validateOrderFreshness`, `previewImpact`, `cascadeStaleCheck`, `hasDependency`. Always use these when creating/activating orders — do not duplicate stale logic in routes or UI.
 
-Common `orderType` values: `salary_increase`, `special_salary`, `promotion`, `transfer`, `resign`, `salary_cap_adjustment`, `salary_apr`, `salary_oct`.
+Common `orderType` values: `salary_increase`, `special_salary`, `promotion`, `transfer`, `resign`, `salary_cap_adjustment`, `salary_apr`, `salary_oct`, `salary_entitlement`, `salary_qualification`, `appointment`.
+
+Order salary snapshot fields (Thai labels in `hr-order-freshness-check-v2.md` §2.1): `salary`, `costOfLivingAllowance` (เงินเพิ่มการครองชีพชั่วคราว), `specialCompensation`, `positionAllowance`, `compensationBeyondSalary` (ค่าตอบแทนนอกเหนือจากเงินเดือน), `salaryAsOfDate`.
 
 ## Conventions
 

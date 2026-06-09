@@ -7,6 +7,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const files = [
   path.join(__dirname, "freshness.test.ts"),
+  path.join(__dirname, "excel-import.test.ts"),
+  path.join(__dirname, "excel-import-integration.test.ts"),
   path.join(__dirname, "api", "employees.test.ts"),
   path.join(__dirname, "api", "batches.test.ts"),
   path.join(__dirname, "api", "dashboard.test.ts"),

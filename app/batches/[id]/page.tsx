@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import { BatchActions } from "./BatchActions"
+import { BatchImportPanel } from "./BatchImportPanel"
 import type { OrderWithPersonMinimal } from "@/lib/types"
 
 export default async function BatchDetailPage({
@@ -46,6 +47,8 @@ export default async function BatchDetailPage({
         <Stat label="🔗 Cascade" value={batch.cascadeTotal} />
         <Stat label="สถานะ" value={batch.status} />
       </div>
+
+      <BatchImportPanel batchId={batch.id} status={batch.status} />
 
       <BatchActions
         batchId={batch.id}

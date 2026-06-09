@@ -4,6 +4,7 @@ import { DataTable } from "@/components/shared/data-table"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
 import { toThaiDate } from "@/lib/date-utils"
+import { getOrderTypeLabel } from "@/lib/order-types"
 
 export type OrderRow = {
   id: number
@@ -19,19 +20,6 @@ export type OrderRow = {
   statusType: string
   statusLevel: string
   statusOrg: string
-}
-
-const typeLabel: Record<string, string> = {
-  salary_increase: "💰 เลื่อนเงินเดือน",
-  special_salary: "💰 เลื่อนพิเศษ",
-  promotion: "📈 เลื่อนตำแหน่ง",
-  transfer: "🔄 ย้าย",
-  transfer_in: "📥 รับโอน",
-  transfer_out: "📤 โอนออก",
-  resign: "👋 ลาออก",
-  retire: "🏁 เกษียณ",
-  education_adjust: "🎓 ปรับวุฒิ",
-  other: "📝 อื่นๆ",
 }
 
 const statusLabel: Record<string, string> = {
@@ -64,7 +52,7 @@ const columns = [
   }),
   columnHelper.accessor("orderType", {
     header: "ประเภท",
-    cell: (info) => typeLabel[info.getValue()] || info.getValue(),
+    cell: (info) => getOrderTypeLabel(info.getValue()),
   }),
   columnHelper.accessor("orderNo", {
     header: "เลขที่",

@@ -3,12 +3,14 @@
 import { DataTable } from "@/components/shared/data-table"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
+import { formatCitizenId } from "@/lib/citizen-id"
 
 export type EmployeeRow = {
   id: number
   nameTitle: string | null
   firstName: string | null
   lastName: string | null
+  citizenId: string | null
   currentPositionName: string | null
   currentPositionType: string | null
   currentPositionLevel: string | null
@@ -43,6 +45,12 @@ const columns = [
         </Link>
       )
     },
+  }),
+  columnHelper.accessor("citizenId", {
+    header: "เลขบัตร",
+    cell: (info) => (
+      <span className="font-mono text-xs text-zinc-600">{formatCitizenId(info.getValue())}</span>
+    ),
   }),
   columnHelper.accessor("currentPositionName", {
     header: "ตำแหน่ง",

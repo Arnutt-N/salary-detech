@@ -14,7 +14,9 @@ async function main() {
   // 1. Create person
   const person = await prisma.person.create({
     data: {
-      firstName: "นางสาวสมหญิง",
+      citizenId: "1100200300401",
+      nameTitle: "นางสาว",
+      firstName: "สมหญิง",
       lastName: "ใจดี",
       currentPositionName: "นักวิชาการเงินและบัญชีปฏิบัติการ",
       currentPositionType: "วิชาการ",

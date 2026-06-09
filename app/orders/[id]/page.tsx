@@ -2,19 +2,7 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { toThaiDate } from "@/lib/date-utils"
-
-const typeLabel: Record<string, string> = {
-  salary_increase: "💰 เลื่อนเงินเดือน",
-  special_salary: "💰 เลื่อนพิเศษ",
-  promotion: "📈 เลื่อนตำแหน่ง",
-  transfer: "🔄 ย้าย",
-  transfer_in: "📥 รับโอน",
-  transfer_out: "📤 โอนออก",
-  resign: "👋 ลาออก",
-  retire: "🏁 เกษียณ",
-  education_adjust: "🎓 ปรับวุฒิ",
-  other: "📝 อื่นๆ",
-}
+import { getOrderTypeLabel } from "@/lib/order-types"
 
 const statusLabel: Record<string, string> = {
   draft: "📝 แบบร่าง",
@@ -97,7 +85,7 @@ export default async function OrderDetailPage({
         <div className="flex justify-between items-start mb-4">
           <div>
             <h1 className="text-2xl font-bold">
-              {typeLabel[order.orderType] || order.orderType}
+              {getOrderTypeLabel(order.orderType)}
             </h1>
             {order.orderNo && (
               <p className="text-sm text-zinc-500 mt-1">เลขที่: {order.orderNo}</p>
@@ -145,7 +133,7 @@ export default async function OrderDetailPage({
               <p>
                 แก้ไขจาก:{" "}
                 <Link href={`/orders/${correctedFromOrder.id}`} className="text-blue-600 hover:underline">
-                  #{correctedFromOrder.id} {correctedFromOrder.orderNo || ""} ({typeLabel[correctedFromOrder.orderType] || correctedFromOrder.orderType})
+                  #{correctedFromOrder.id} {correctedFromOrder.orderNo || ""} ({getOrderTypeLabel(correctedFromOrder.orderType)})
                 </Link>
               </p>
             )}
@@ -156,7 +144,7 @@ export default async function OrderDetailPage({
                   <span key={o.id}>
                     {i > 0 && ", "}
                     <Link href={`/orders/${o.id}`} className="text-blue-600 hover:underline">
-                      #{o.id} {o.orderNo || ""} ({typeLabel[o.orderType] || o.orderType})
+                      #{o.id} {o.orderNo || ""} ({getOrderTypeLabel(o.orderType)})
                     </Link>
                   </span>
                 ))}

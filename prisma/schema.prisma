@@ -47,18 +47,40 @@ model Order {
   issueDate          String   @map("issue_date")
   effectiveDate      String   @map("effective_date")
 
-  // Data Snapshot
-  salary           Float?   @map("salary")
-  salaryAsOfDate   String?  @map("salary_as_of_date")
-  salarySystemType String?  @map("salary_system_type")
+  // Data Snapshot — salary components (Thai labels in hr-order-freshness-check-v2.md §2.1)
+  salary                    Float?   @map("salary") // เงินเดือน
+  costOfLivingAllowance     Float?   @map("cost_of_living_allowance") // เงินเพิ่มการครองชีพชั่วคราว
+  specialCompensation       Float?   @map("special_compensation") // ค่าตอบแทนพิเศษ
+  positionAllowance         Float?   @map("position_allowance") // เงินประจำตำแหน่ง
+  compensationBeyondSalary  Float?   @map("compensation_beyond_salary") // ค่าตอบแทนนอกเหนือจากเงินเดือน
+  salaryAsOfDate            String?  @map("salary_as_of_date") // เงินเดือน ณ วันที่
+  salarySystemType          String?  @map("salary_system_type")
 
   positionName  String? @map("position_name")
   positionType  String? @map("position_type")
   positionLevel String? @map("position_level")
+  positionNo    String? @map("position_no")
   bureau        String?
   division      String?
+  subDivision   String? @map("sub_division")
   department    String?
   ministry      String?
+  note          String?
+
+  // Prior snapshot (movement — ฝั่งเดิม §2.1)
+  priorSalary                  Float?  @map("prior_salary")
+  priorCostOfLivingAllowance   Float?  @map("prior_cost_of_living_allowance")
+  priorSpecialCompensation     Float?  @map("prior_special_compensation")
+  priorSalaryAsOfDate          String? @map("prior_salary_as_of_date")
+  priorPositionName            String? @map("prior_position_name")
+  priorPositionType            String? @map("prior_position_type")
+  priorPositionLevel           String? @map("prior_position_level")
+  priorPositionNo              String? @map("prior_position_no")
+  priorBureau                  String? @map("prior_bureau")
+  priorDivision                String? @map("prior_division")
+  priorSubDivision             String? @map("prior_sub_division")
+  priorDepartment              String? @map("prior_department")
+  priorMinistry                String? @map("prior_ministry")
 
   // Freshness Status
   statusSalary   String  @default("latest") @map("status_salary")

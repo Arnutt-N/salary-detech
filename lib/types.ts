@@ -65,6 +65,7 @@ export interface PersonListItem {
   nameTitle: string | null
   firstName: string | null
   lastName: string | null
+  citizenId?: string | null
   currentPositionName: string | null
   currentPositionType: string | null
   currentPositionLevel: string | null

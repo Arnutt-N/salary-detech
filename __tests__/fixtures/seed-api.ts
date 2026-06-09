@@ -18,6 +18,7 @@ export async function seedApiDb() {
   for (let i = 1; i <= 5; i++) {
     const p = await prisma.person.create({
       data: {
+        citizenId: `110020030040${i}`,
         firstName: `ทดสอบ${i}`,
         lastName: `นามสกุล${i}`,
         currentPositionName: "นักจัดการงานทั่วไป",
