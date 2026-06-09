@@ -1,5 +1,8 @@
 import { prisma } from "../../lib/prisma"
 
+/** Buddhist-era adjust date used across freshness scenario tests (G1). */
+export const FRESHNESS_ADJUST_DATE = "2568-12-25"
+
 export async function seedFreshnessDb() {
   // Clean existing data in dependency order
   await prisma.employeeChangeLog.deleteMany()
@@ -33,7 +36,7 @@ export async function seedFreshnessDb() {
   // Create a salary base adjustment (later date)
   const adjustment = await prisma.salaryBaseAdjustment.create({
     data: {
-      adjustDate: "2568-12-25",
+      adjustDate: FRESHNESS_ADJUST_DATE,
       description: "ปรับอัตราเงินเดือนทั่วประเทศ 5%",
       multiplier: 1.05,
     },

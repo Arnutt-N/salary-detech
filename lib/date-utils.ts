@@ -41,3 +41,25 @@ export function toChristianYear(buddhistYear: number): number {
 export function toBuddhistYear(christianYear: number): number {
   return christianYear + BUDDHIST_ERA_OFFSET
 }
+
+/** Lexicographic compare on YYYY-MM-DD business date strings (พ.ศ. or ค.ศ.). */
+export function compareBusinessDates(
+  a: string | null,
+  b: string | null
+): number | null {
+  if (a == null || b == null) return null
+  if (a < b) return -1
+  if (a > b) return 1
+  return 0
+}
+
+export function maxBusinessDate(
+  dates: (string | null | undefined)[]
+): string | null {
+  let max: string | null = null
+  for (const d of dates) {
+    if (!d) continue
+    if (max === null || d > max) max = d
+  }
+  return max
+}

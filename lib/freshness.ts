@@ -1,5 +1,5 @@
 import { prisma } from "./prisma"
-import { parseISO, isValid } from "date-fns"
+import { compareBusinessDates, maxBusinessDate } from "./date-utils"
 
 // ─── Types ───
 
@@ -39,12 +39,6 @@ export interface PreviewResult {
 
 // ─── Helpers ───
 
-function parseDate(s: string | null | undefined): Date | null {
-  if (!s) return null
-  const d = parseISO(s)
-  return isValid(d) ? d : null
-}
-
 function parseJson(s: string | null | undefined): Record<string, unknown> | null {
   if (!s) return null
   try {
@@ -54,79 +48,78 @@ function parseJson(s: string | null | undefined): Record<string, unknown> | null
   }
 }
 
+const SALARY_EFFECTIVE_ORDER_TYPES = [
+  "salary_increase",
+  "special_salary",
+  "salary_apr",
+  "salary_oct",
+  "salary_qualification",
+  "salary_entitlement",
+  "salary_cap_adjustment",
+  "promotion",
+  "appointment",
+] as const
+
+const SALARY_CHANGING_ORDER_TYPES = [
+  "salary_increase",
+  "special_salary",
+  "salary_apr",
+  "salary_oct",
+  "salary_qualification",
+  "salary_entitlement",
+  "salary_cap_adjustment",
+] as const
+
+const ORG_LEVEL_CHANGING_ORDER_TYPES = [
+  "promotion",
+  "transfer",
+  "transfer_in",
+  "transfer_out",
+  "assign_transfer",
+] as const
+
+const DATE_CONSTRAINED_SALARY_ORDER_TYPES = [
+  "appointment",
+  "salary_entitlement",
+  "salary_qualification",
+] as const
+
 // ─── 1. Max Salary Effective Date (§6) ───
 
 export async function getMaxSalaryEffectiveDate(
   employeeId: number
-): Promise<Date | null> {
-  const results: (Date | null)[] = []
+): Promise<string | null> {
+  const results: (string | null)[] = []
 
-  // (a) salary_increase + special_salary orders
   const salaryOrders = await prisma.order.findMany({
     where: {
       employeeId,
-      orderType: { in: ["salary_increase", "special_salary"] },
+      orderType: { in: [...SALARY_EFFECTIVE_ORDER_TYPES] },
       orderStatus: "active",
     },
     select: { effectiveDate: true },
   })
-  results.push(
-    ...salaryOrders.map((o: { effectiveDate: string | null }) =>
-      parseDate(o.effectiveDate)
-    )
-  )
+  results.push(...salaryOrders.map((o) => o.effectiveDate))
 
-  // (b) promotion orders (change calculation base)
-  const promotions = await prisma.order.findMany({
-    where: {
-      employeeId,
-      orderType: "promotion",
-      orderStatus: "active",
-    },
-    select: { effectiveDate: true },
-  })
-  results.push(
-    ...promotions.map((o: { effectiveDate: string | null }) =>
-      parseDate(o.effectiveDate)
-    )
-  )
-
-  // (c) system-wide adjustments
   const adjustments = await prisma.salaryAdjustmentApplicant.findMany({
     where: { employeeId, adjustment: { isActive: true } },
     select: { adjustment: { select: { adjustDate: true } } },
   })
-  results.push(
-    ...adjustments.map((a: { adjustment: { adjustDate: string | null } }) =>
-      parseDate(a.adjustment.adjustDate)
-    )
-  )
+  results.push(...adjustments.map((a) => a.adjustment.adjustDate))
 
-  // (d) education adjustments
   const edu = await prisma.employeeEducationAdjustment.findMany({
     where: { employeeId },
     select: { councilApprovalDate: true },
   })
-  results.push(
-    ...edu.map((e: { councilApprovalDate: string | null }) =>
-      parseDate(e.councilApprovalDate)
-    )
-  )
+  results.push(...edu.map((e) => e.councilApprovalDate))
 
-  // (e) S5 compensation-to-salary
   const comps = await prisma.compensationToSalary.findMany({
     where: { employeeId },
     select: { effectiveDate: true },
   })
-  results.push(
-    ...comps.map((c: { effectiveDate: string | null }) =>
-      parseDate(c.effectiveDate)
-    )
-  )
+  results.push(...comps.map((c) => c.effectiveDate))
 
-  const valid = results.filter((d): d is Date => d !== null)
-  if (valid.length === 0) return null
-  return new Date(Math.max(...valid.map((d) => d.getTime())))
+  return maxBusinessDate(results)
 }
 
 // ─── 2. Current State Helpers ───
@@ -221,8 +214,8 @@ export async function isOrderStale(order: {
   // Check 1: salary
   if (order.salaryAsOfDate) {
     const maxDate = await getMaxSalaryEffectiveDate(order.employeeId)
-    const asOf = parseDate(order.salaryAsOfDate)
-    if (maxDate && asOf && asOf < maxDate) {
+    const cmp = compareBusinessDates(order.salaryAsOfDate, maxDate)
+    if (cmp !== null && cmp < 0) {
       result.statusSalary = "stale"
     }
   }
@@ -267,10 +260,12 @@ export async function isOrderStale(order: {
   // Check 6: system adjustments
   if (order.salaryAsOfDate) {
     const adjs = await getApplicableAdjustments(order.employeeId)
-    const asOf = parseDate(order.salaryAsOfDate)
     for (const adj of adjs) {
-      const adjDate = parseDate(adj.adjustment.adjustDate)
-      if (adjDate && asOf && asOf < adjDate) {
+      const cmp = compareBusinessDates(
+        order.salaryAsOfDate,
+        adj.adjustment.adjustDate
+      )
+      if (cmp !== null && cmp < 0) {
         result.statusSalary = "stale"
         break
       }
@@ -340,15 +335,25 @@ export function hasDependency(
     effectiveDate: string
   }
 ): boolean {
-  // newOrder changes salary → existing order references salary
   if (
-    ["salary_increase", "special_salary"].includes(newOrder.orderType) &&
+    (SALARY_CHANGING_ORDER_TYPES as readonly string[]).includes(
+      newOrder.orderType
+    ) &&
     existingOrder.salaryAsOfDate
   ) {
     return true
   }
 
-  // newOrder is resign → salary_increase orders after resign date are affected
+  if (
+    (DATE_CONSTRAINED_SALARY_ORDER_TYPES as readonly string[]).includes(
+      newOrder.orderType
+    ) &&
+    existingOrder.salaryAsOfDate &&
+    newOrder.effectiveDate <= existingOrder.effectiveDate
+  ) {
+    return true
+  }
+
   if (
     newOrder.orderType === "resign" &&
     existingOrder.orderType === "salary_increase" &&
@@ -357,19 +362,12 @@ export function hasDependency(
     return true
   }
 
-  // newOrder changes level/position/org → salary_increase orders affected
   if (
-    ["promotion", "transfer"].includes(newOrder.orderType) &&
+    (ORG_LEVEL_CHANGING_ORDER_TYPES as readonly string[]).includes(
+      newOrder.orderType
+    ) &&
     existingOrder.orderType === "salary_increase" &&
     newOrder.effectiveDate <= existingOrder.effectiveDate
-  ) {
-    return true
-  }
-
-  // S5 affects orders that reference salary
-  if (
-    ["salary_cap_adjustment"].includes(newOrder.orderType) &&
-    existingOrder.salaryAsOfDate
   ) {
     return true
   }
@@ -386,10 +384,18 @@ export function buildPreviewReason(
   const typeMap: Record<string, string> = {
     salary_increase: "เลื่อนเงินเดือน",
     special_salary: "เลื่อนเงินเดือนกรณีพิเศษ",
-    promotion: "เลื่อนระดับ",
-    transfer: "ย้าย",
-    resign: "ลาออก",
+    salary_apr: "เลื่อนเงินเดือน 1 เม.ย.",
+    salary_oct: "เลื่อนเงินเดือน 1 ต.ค.",
+    salary_qualification: "เงินเดือนตามคุณวุฒิ",
+    salary_entitlement: "ให้ได้รับเงินเดือน",
     salary_cap_adjustment: "ค่าตอบแทนพิเศษ → เลื่อนเงินเดือน",
+    promotion: "เลื่อนระดับ",
+    appointment: "แต่งตั้ง",
+    transfer: "ย้าย",
+    transfer_in: "รับโอน",
+    transfer_out: "โอนออก",
+    assign_transfer: "ให้โอน",
+    resign: "ลาออก",
   }
 
   const newType = typeMap[newOrder.orderType] || newOrder.orderType
