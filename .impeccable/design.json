@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-11T00:00:00.000Z",
+  "title": "Design System: Salary Detech",
+  "extensions": {
+    "colorMeta": {
+      "page-bg": {
+        "role": "neutral",
+        "displayName": "Page Mist",
+        "canonical": "oklch(98.5% 0.002 264)",
+        "tonalRamp": ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#f4f4f5", "#f9fafb"]
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "Action Blue",
+        "canonical": "oklch(54.6% 0.215 262)",
+        "tonalRamp": ["#1e3a8a", "#1d4ed8", "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe", "#dbeafe", "#eff6ff"]
+      },
+      "alert": {
+        "role": "tertiary",
+        "displayName": "Alert Red",
+        "canonical": "oklch(57.7% 0.215 27)",
+        "tonalRamp": ["#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fecaca", "#fef2f2"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Page Heading", "purpose": "h1 on each route — text-2xl font-bold" },
+      "body": { "displayName": "Body", "purpose": "Tables, forms, nav — text-sm" },
+      "label": { "displayName": "Field Label", "purpose": "Form labels — text-xs zinc-500" }
+    },
+    "shadows": [
+      { "name": "surface-rest", "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)", "purpose": "Cards and tables at rest (shadow-sm)" },
+      { "name": "surface-hover", "value": "0 4px 6px -1px rgb(0 0 0 / 0.1)", "purpose": "KPI card hover lift (shadow-md)" }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.25, 1, 0.5, 1)", "purpose": "Default transition-colors on cards and links" }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main action — create, manage batch, navigate to report.",
+      "html": "<button class=\"ds-btn-primary\">สร้างคำสั่งใหม่</button>",
+      "css": ".ds-btn-primary { background: #2563eb; color: #fff; padding: 8px 16px; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s ease-out; font-family: 'Noto Sans Thai', sans-serif; } .ds-btn-primary:hover { background: #1d4ed8; } .ds-btn-primary:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Cancel or secondary navigation.",
+      "html": "<button class=\"ds-btn-secondary\">ยกเลิก</button>",
+      "css": ".ds-btn-secondary { background: #fff; color: #18181b; padding: 8px 16px; font-size: 0.875rem; border: 1px solid #e4e4e7; border-radius: 8px; cursor: pointer; transition: background 0.15s ease-out; font-family: 'Noto Sans Thai', sans-serif; } .ds-btn-secondary:hover { background: #fafafa; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "Standard form field.",
+      "html": "<label class=\"ds-label\">วันที่มีผล</label><input class=\"ds-input\" type=\"text\" placeholder=\"YYYY-MM-DD\" />",
+      "css": ".ds-label { display: block; font-size: 0.75rem; font-weight: 500; color: #71717a; margin-bottom: 4px; font-family: 'Noto Sans Thai', sans-serif; } .ds-input { width: 100%; padding: 8px 12px; font-size: 0.875rem; border: 1px solid #d4d4d8; border-radius: 8px; font-family: 'Noto Sans Thai', sans-serif; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); } .ds-input:focus { outline: none; border-color: #71717a; box-shadow: 0 0 0 2px rgb(113 113 122 / 0.2); }"
+    },
+    {
+      "name": "KPI Card",
+      "kind": "card",
+      "refersTo": "kpi-card",
+      "description": "Dashboard metric — links to filtered list.",
+      "html": "<a class=\"ds-kpi-card\" href=\"#\"><div class=\"ds-kpi-value\">42</div><div class=\"ds-kpi-label\">คำสั่งทั้งหมด</div></a>",
+      "css": ".ds-kpi-card { display: block; background: #fff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 16px; text-decoration: none; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: box-shadow 0.15s ease-out; font-family: 'Noto Sans Thai', sans-serif; } .ds-kpi-card:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); } .ds-kpi-value { font-size: 1.5rem; font-weight: 700; color: #18181b; } .ds-kpi-label { font-size: 0.875rem; color: #71717a; margin-top: 4px; }"
+    },
+    {
+      "name": "KPI Card Alert",
+      "kind": "card",
+      "refersTo": "kpi-card-alert",
+      "description": "Stale or pending count — draws attention without alarm.",
+      "html": "<a class=\"ds-kpi-alert\" href=\"#\"><div class=\"ds-kpi-value\">3</div><div class=\"ds-kpi-label\">ต้องแก้ไข</div></a>",
+      "css": ".ds-kpi-alert { display: block; background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 16px; text-decoration: none; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); font-family: 'Noto Sans Thai', sans-serif; } .ds-kpi-alert .ds-kpi-value { font-size: 1.5rem; font-weight: 700; color: #b91c1c; } .ds-kpi-alert .ds-kpi-label { font-size: 0.875rem; color: #71717a; margin-top: 4px; }"
+    },
+    {
+      "name": "Main Navigation",
+      "kind": "nav",
+      "refersTo": "nav-main",
+      "description": "Sticky top nav — hidden on login.",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-nav-brand\">Salary Detech</span><a class=\"ds-nav-link ds-nav-active\" href=\"#\">แผงควบคุม</a><a class=\"ds-nav-link\" href=\"#\">ข้าราชการ</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 20px; height: 48px; padding: 0 24px; background: #fff; border-bottom: 1px solid #e4e4e7; font-family: 'Noto Sans Thai', sans-serif; font-size: 0.875rem; } .ds-nav-brand { font-weight: 700; color: #18181b; margin-right: 8px; } .ds-nav-link { color: #52525b; text-decoration: none; } .ds-nav-link:hover { color: #18181b; } .ds-nav-active { color: #18181b; font-weight: 500; }"
+    },
+    {
+      "name": "Data Table",
+      "kind": "custom",
+      "refersTo": "table-data",
+      "description": "Primary data surface for orders, employees, batches.",
+      "html": "<div class=\"ds-table-wrap\"><table class=\"ds-table\"><thead><tr><th>ข้าราชการ</th><th>ประเภท</th></tr></thead><tbody><tr><td>สมชาย ใจดี</td><td>เลื่อนเงินเดือน</td></tr></tbody></table></div>",
+      "css": ".ds-table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); overflow: hidden; } .ds-table { width: 100%; border-collapse: collapse; font-family: 'Noto Sans Thai', sans-serif; font-size: 0.875rem; } .ds-table th { text-align: left; padding: 12px; background: #fafafa; border-bottom: 1px solid #e4e4e7; font-weight: 500; } .ds-table td { padding: 12px; border-bottom: 1px solid #f4f4f5; } .ds-table tbody tr:hover { background: #fafafa; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Trusted Clerk's Desk",
+    "overview": "Salary Detech ควรรู้สึกเหมือนโต๊ะทำงานของเจ้าหน้าที่ HR ที่เป็นระเบียบ อบอุ่น และช่วยให้มั่นใจ: ข้อมูลอ่านง่าย ลิงก์ไปแก้ปัญหาได้ทันที ไม่มี visual noise ที่ทำให้กลัวกดผิด",
+    "keyCharacteristics": [
+      "Thai-first copy และวันที่ พ.ศ.",
+      "Zinc neutral base + semantic accent",
+      "White surfaces บน gray-50 page bg",
+      "Sticky top nav, max-w-5xl layout",
+      "Tables และ forms เป็นหัวใจ"
+    ],
+    "rules": [
+      { "name": "The Semantic Color Rule", "body": "สีนอก zinc palette ต้องมีความหมาย (action / danger / success) ห้ามใช้ gradient หรือ accent ตกแต่ง", "section": "colors" },
+      { "name": "The Thai Date Rule", "body": "วันที่ธุรกิจแสดงด้วย toThaiDate (พ.ศ.) เสมอ", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "พื้นผิว flat ที่ rest; shadow เพิ่มเฉพาะ hover", "section": "elevation" }
+    ],
+    "dos": [
+      "Do ใช้ max-w-5xl mx-auto p-6 เป็น page shell มาตรฐาน",
+      "Do ลิงก์จาก KPI/table rows ไป order/employee detail โดยตรง",
+      "Do ใช้ Sonner toast สำหรับ feedback หลัง mutation",
+      "Do ใช้ shared labels จาก lib/order-types.ts และ stale logic จาก lib/freshness.ts",
+      "Do รักษา contrast ≥4.5:1 สำหรับ body text"
+    ],
+    "donts": [
+      "Don't ใช้ SaaS marketing template (gradient hero, identical card grids, buzzwords)",
+      "Don't ทำตารางแน่นหรือตัวอักษรเล็กจนอ่านยาก",
+      "Don't ใช้ side-stripe borders, gradient text, glassmorphism ตกแต่ง",
+      "Don't ใส่ eyebrow labels ทุก section",
+      "Don't ปน EN/TH โดยไม่จำเป็น"
+    ]
+  }
+}

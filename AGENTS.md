@@ -112,6 +112,15 @@ Default seed login: `admin` / `password` (change in production).
 3. Run `npx tsx __tests__/run.ts` before claiming done.
 4. Keep diffs minimal; match naming and import style (`@/` alias) of neighboring files.
 
+## Design Context
+
+Before UI/UX work, read:
+
+- `PRODUCT.md` — register (`product`), users, purpose, brand personality, anti-references, design principles
+- `DESIGN.md` — visual tokens, typography, components, do's/don'ts (DESIGN wins on visual; PRODUCT wins on voice/strategy)
+
+Live mode config: `.impeccable/live/config.json` (Next.js App Router → `app/layout.tsx`).
+
 ## Avoid
 
 - Duplicating freshness/stale rules outside `lib/freshness.ts`.
