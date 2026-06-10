@@ -7,6 +7,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  DATABASE_URL: "file:./dev.db"
+  AUTH_SECRET: "ci-test-secret"
+  AUTH_TRUST_HOST: "true"
+  ADMIN_USERNAME: "admin"
+  ADMIN_PASSWORD: "password"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,40 +31,65 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        env:
-          DATABASE_URL: "file:./dev.db"
 
       - name: Generate Prisma client
         run: npx prisma generate
-        env:
-          DATABASE_URL: "file:./dev.db"
 
       - name: Push schema (SQLite)
         run: npx prisma db push
-        env:
-          DATABASE_URL: "file:./dev.db"
 
       - name: Lint
         run: npm run lint 2>&1 || true
-        env:
-          DATABASE_URL: "file:./dev.db"
 
       - name: Build
         run: npm run build
-        env:
-          DATABASE_URL: "file:./dev.db"
 
       - name: Seed test data
         run: npx tsx prisma/seed.ts 2>&1 || true
-        env:
-          DATABASE_URL: "file:./dev.db"
 
       - name: Run tests
         run: npx tsx __tests__/run.ts
-        env:
-          DATABASE_URL: "file:./dev.db"
 
       - name: Type check
         run: npx tsc --noEmit 2>&1 || true
-        env:
-          DATABASE_URL: "file:./dev.db"
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Push schema (SQLite)
+        run: npx prisma db push
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

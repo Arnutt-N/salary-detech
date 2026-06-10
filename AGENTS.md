@@ -97,6 +97,8 @@ Order salary snapshot fields (Thai labels in `hr-order-freshness-check-v2.md` §
 ```bash
 npm run dev              # local dev (SQLite dev.db by default)
 npm run build && npm run lint
+npm run test:e2e:full  # build + Playwright batch import flow
+npm run test:e2e       # Playwright only (requires prior build)
 npx prisma db push && npx tsx prisma/seed.ts
 npx tsx __tests__/run.ts # full test suite (CI)
 ```

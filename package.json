@@ -11,6 +11,9 @@
     "test": "tsx --test __tests__/**/*.test.ts",
     "test:api": "tsx --test __tests__/api/*.test.ts",
     "test:freshness": "tsx --test __tests__/freshness.test.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:full": "npm run build && playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -40,6 +43,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

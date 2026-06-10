@@ -4,3 +4,7 @@ dev.db
 dev.db-journal
 .env
 *.tsbuildinfo
+playwright-report/
+test-results/
+blob-report/
+e2e/.runtime.json

@@ -101,6 +101,7 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
           <label className="text-xs text-zinc-500">ไฟล์ .xlsx</label>
           <input
             type="file"
+            data-testid="import-file"
             accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             onChange={(e) => {
               setFile(e.target.files?.[0] ?? null)
@@ -111,6 +112,7 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
         </div>
         <button
           type="button"
+          data-testid="import-preview"
           onClick={handlePreview}
           disabled={!!loading || !file}
           className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50 disabled:opacity-50"
@@ -119,6 +121,7 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
         </button>
         <button
           type="button"
+          data-testid="import-commit"
           onClick={handleImport}
           disabled={!!loading || !preview?.summary.ready}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"

@@ -45,7 +45,7 @@ export default async function BatchDetailPage({
         <Stat label="⚠️ กระทบ" value={batch.affectedOrders} color="text-amber-600" />
         <Stat label="🔴 Blocker" value={batch.blockerOrders} color="text-red-600" />
         <Stat label="🔗 Cascade" value={batch.cascadeTotal} />
-        <Stat label="สถานะ" value={batch.status} />
+        <Stat label="สถานะ" value={batch.status} testId="batch-status" />
       </div>
 
       <BatchImportPanel batchId={batch.id} status={batch.status} />
@@ -101,13 +101,18 @@ function Stat({
   label,
   value,
   color = "text-zinc-900",
+  testId,
 }: {
   label: string
   value: number | string
   color?: string
+  testId?: string
 }) {
   return (
-    <div className="bg-white rounded-lg p-3 text-center shadow-sm border">
+    <div
+      className="bg-white rounded-lg p-3 text-center shadow-sm border"
+      {...(testId ? { "data-testid": testId } : {})}
+    >
       <div className={`text-xl font-bold ${color}`}>{value}</div>
       <div className="text-xs text-zinc-500 mt-1">{label}</div>
     </div>
