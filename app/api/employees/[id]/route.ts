@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { STALE_ORDER_WHERE } from "@/lib/freshness"
 import { personSchema, personFormToApiBody } from "@/lib/validation/person-schema"
 
 async function assertUniqueCitizenId(citizenId: string | null, excludeId: number) {
@@ -56,17 +57,7 @@ export async function GET(
   }
 
   const staleCount = await prisma.order.count({
-    where: {
-      employeeId: id,
-      orderStatus: { in: ["active", "superseded"] },
-      OR: [
-        { statusSalary: "stale" },
-        { statusLevel: "stale" },
-        { statusPosition: "stale" },
-        { statusType: "stale" },
-        { statusOrg: "stale" },
-      ],
-    },
+    where: { employeeId: id, ...STALE_ORDER_WHERE },
   })
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

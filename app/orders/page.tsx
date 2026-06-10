@@ -1,30 +1,9 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import { ORDER_TYPE_OPTIONS, ORDER_STATUS_OPTIONS } from "@/lib/order-types"
 import { OrdersTable, type OrderRow } from "./OrdersTable"
 
 const PAGE_SIZE = 50
-
-const typeLabel: Record<string, string> = {
-  salary_increase: "💰 เลื่อนเงินเดือน",
-  special_salary: "💰 เลื่อนพิเศษ",
-  promotion: "📈 เลื่อนตำแหน่ง",
-  transfer: "🔄 ย้าย",
-  transfer_in: "📥 รับโอน",
-  transfer_out: "📤 โอนออก",
-  resign: "👋 ลาออก",
-  retire: "🏁 เกษียณ",
-  education_adjust: "🎓 ปรับวุฒิ",
-  other: "📝 อื่นๆ",
-}
-
-const statusLabel: Record<string, string> = {
-  draft: "📝 แบบร่าง",
-  preview: "👁️ ตรวจสอบ",
-  active: "✅ มีผล",
-  cancelled: "🚫 เพิกถอน",
-  superseded: "🔄 ถูกแทนที่",
-  void: "⛔ โมฆะ",
-}
 
 export default async function OrdersPage({
   searchParams,
@@ -91,6 +70,12 @@ export default async function OrdersPage({
     <div className="max-w-5xl mx-auto p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">📋 คำสั่งทั้งหมด</h1>
+        <Link
+          href="/orders/new"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+        >
+          ➕ สร้างคำสั่งใหม่
+        </Link>
       </div>
 
       {/* Filters */}
@@ -104,14 +89,14 @@ export default async function OrdersPage({
           />
           <select name="type" defaultValue={type} className="px-3 py-2 border rounded-lg text-sm">
             <option value="">ทุกประเภท</option>
-            {Object.entries(typeLabel).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
+            {ORDER_TYPE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
           <select name="status" defaultValue={status} className="px-3 py-2 border rounded-lg text-sm">
             <option value="">ทุกสถานะ</option>
-            {Object.entries(statusLabel).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
+            {ORDER_STATUS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
           <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
@@ -130,7 +115,12 @@ export default async function OrdersPage({
       {tableData.length === 0 ? (
         <div className="text-center py-12 text-zinc-400">
           <p className="text-lg">ยังไม่มีคำสั่ง</p>
-          <p className="text-sm mt-1">เริ่มต้นด้วยการสร้างคำสั่งใหม่</p>
+          <p className="text-sm mt-1">
+            เริ่มต้นด้วยการ{" "}
+            <Link href="/orders/new" className="text-blue-600 hover:underline">
+              สร้างคำสั่งใหม่
+            </Link>
+          </p>
         </div>
       ) : (
         <OrdersTable data={tableData} />

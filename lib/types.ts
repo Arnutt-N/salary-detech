@@ -56,6 +56,8 @@ export interface OrderWithPersonMinimal {
   orderStatus: string
   statusSalary: string | null
   statusLevel: string | null
+  statusPosition: string | null
+  statusType: string | null
   statusOrg: string | null
   person?: PersonName | null
 }

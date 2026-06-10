@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { STALE_ORDER_WHERE } from "@/lib/freshness"
 import type { StaleOrderWithPerson } from "@/lib/types"
 
 const MAX_EXPORT = 5000
@@ -9,16 +10,7 @@ export async function GET(request: NextRequest) {
   const format = searchParams.get("format") || "csv"
 
   const orders = (await prisma.order.findMany({
-    where: {
-      orderStatus: { in: ["active", "superseded"] },
-      OR: [
-        { statusSalary: "stale" },
-        { statusLevel: "stale" },
-        { statusPosition: "stale" },
-        { statusType: "stale" },
-        { statusOrg: "stale" },
-      ],
-    },
+    where: STALE_ORDER_WHERE,
     orderBy: [{ employeeId: "asc" }, { effectiveDate: "desc" }],
     take: MAX_EXPORT,
     select: {

@@ -1,4 +1,4 @@
-# Salary Audit — ระบบตรวจสอบคำสั่งข้าราชการ
+# Salary Detech — ระบบตรวจสอบคำสั่งข้าราชการ
 
 ระบบตรวจสอบความถูกต้องของข้อมูลในคำสั่งข้าราชการ (HR Order Freshness Check) — ให้ข้อมูลในคำสั่งตรงกับข้อเท็จจริง ณ `effective_date` ของคำสั่งนั้นเสมอ
 
@@ -18,8 +18,8 @@
 
 ```bash
 # 1. Clone
-git clone git@github.com:Arnutt-N/salary-audit.git
-cd salary-audit
+git clone git@github.com:Arnutt-N/salary-detech.git
+cd salary-detech
 
 # 2. Install
 npm install

@@ -1,4 +1,4 @@
-# Project Roadmap Plan (PRP) — salary-audit
+# Project Roadmap Plan (PRP) — salary-detech
 ## HR Order Freshness Check System
 
 ---
@@ -202,10 +202,10 @@ app/employees/[id]/page.tsx             ✅
   - [x] API route protection (proxy.ts middleware)
   - [x] Input sanitization (Prisma handles SQL injection)
 - [ ] **Deploy**
-  - [ ] Vercel project linked to `salary-audit` repo
+  - [ ] Vercel project linked to `salary-detech` repo
   - [ ] Environment variables: DATABASE_URL, AUTH_SECRET, SENTRY_DSN
   - [x] Production build check (CI passes)
-  - [ ] Domain: `salary-audit.vercel.app`
+  - [ ] Domain: `salary-detech.vercel.app`
 - [x] **Documentation**
   - [x] README.md with setup instructions
   - [x] `.env.example`

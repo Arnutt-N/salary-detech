@@ -1,19 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import { STALE_ORDER_WHERE } from "@/lib/freshness"
+import { ORDER_TYPE_OPTIONS } from "@/lib/order-types"
 import { StaleTable, type StaleRow } from "./StaleTable"
-
-const typeLabel: Record<string, string> = {
-  salary_increase: "💰 เลื่อนเงินเดือน",
-  special_salary: "💰 เลื่อนพิเศษ",
-  promotion: "📈 เลื่อนตำแหน่ง",
-  transfer: "🔄 ย้าย",
-  transfer_in: "📥 รับโอน",
-  transfer_out: "📤 โอนออก",
-  resign: "👋 ลาออก",
-  retire: "🏁 เกษียณ",
-  education_adjust: "🎓 ปรับวุฒิ",
-  other: "📝 อื่นๆ",
-}
 
 export default async function StaleReportPage({
   searchParams,
@@ -24,16 +13,7 @@ export default async function StaleReportPage({
   const type = searchParams.type || ""
   const PAGE_SIZE = 50
 
-  const where: Record<string, unknown> = {
-    orderStatus: { in: ["active", "superseded"] },
-    OR: [
-      { statusSalary: "stale" },
-      { statusPosition: "stale" },
-      { statusType: "stale" },
-      { statusLevel: "stale" },
-      { statusOrg: "stale" },
-    ],
-  }
+  const where: Record<string, unknown> = { ...STALE_ORDER_WHERE }
   if (type) where.orderType = type
 
   const [orders, total] = await Promise.all([
@@ -75,8 +55,8 @@ export default async function StaleReportPage({
         <div className="flex gap-2 items-end">
           <select name="type" defaultValue={type} className="px-3 py-2 border rounded-lg text-sm">
             <option value="">ทุกประเภท</option>
-            {Object.entries(typeLabel).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
+            {ORDER_TYPE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
           <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">

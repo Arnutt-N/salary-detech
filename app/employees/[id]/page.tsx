@@ -3,19 +3,9 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { EmployeeOrderResult, ChangeLogWithOrder } from "@/lib/types"
 import { formatCitizenId } from "@/lib/citizen-id"
-
-const typeLabel: Record<string, string> = {
-  salary_apr: "เลื่อนเงินเดือน 1 เม.ย.",
-  salary_oct: "เลื่อนเงินเดือน 1 ต.ค.",
-  special_salary: "เลื่อนพิเศษ",
-  promotion: "เลื่อนตำแหน่ง",
-  transfer: "ย้าย",
-  transfer_in: "รับโอน",
-  transfer_out: "โอนออก",
-  resign: "ลาออก",
-  retire: "เกษียณ",
-  other: "อื่นๆ",
-}
+import { STALE_ORDER_WHERE } from "@/lib/freshness"
+import { getOrderTypeLabel } from "@/lib/order-types"
+import { toThaiDate } from "@/lib/date-utils"
 
 const fieldLabel: Record<string, string> = {
   salary: "💰 เงินเดือน",
@@ -102,17 +92,7 @@ export default async function EmployeeDetailPage({
 
   // Stale count
   const staleCount = await prisma.order.count({
-    where: {
-      employeeId: id,
-      orderStatus: { in: ["active", "superseded"] },
-      OR: [
-        { statusSalary: "stale" },
-        { statusLevel: "stale" },
-        { statusPosition: "stale" },
-        { statusType: "stale" },
-        { statusOrg: "stale" },
-      ],
-    },
+    where: { employeeId: id, ...STALE_ORDER_WHERE },
   })
 
   const field = (label: string, value?: string | number | null) => (
@@ -216,11 +196,11 @@ export default async function EmployeeDetailPage({
                   <span className="text-lg">{icon}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
-                      {typeLabel[o.orderType] || o.orderType}
+                      {getOrderTypeLabel(o.orderType)}
                       {o.positionName ? ` — ${o.positionName}` : ""}
                     </p>
                     <p className="text-xs text-zinc-400">
-                      {o.effectiveDate} | {o.orderNo || "ไม่มีเลขที่"}
+                      {toThaiDate(o.effectiveDate)} | {o.orderNo || "ไม่มีเลขที่"}
                     </p>
                   </div>
                   {o.salary && (

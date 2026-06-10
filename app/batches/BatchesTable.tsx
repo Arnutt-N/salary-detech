@@ -3,6 +3,8 @@
 import { DataTable } from "@/components/shared/data-table"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
+import { getOrderTypeLabel } from "@/lib/order-types"
+import { toThaiDate } from "@/lib/date-utils"
 
 export type BatchRow = {
   id: number
@@ -13,16 +15,6 @@ export type BatchRow = {
   cleanOrders: number
   affectedOrders: number
   blockerOrders: number
-}
-
-function typeLabel(t: string): string {
-  const map: Record<string, string> = {
-    salary_apr: "เลื่อนเงินเดือน 1 เม.ย.",
-    salary_oct: "เลื่อนเงินเดือน 1 ต.ค.",
-    promotion: "เลื่อนตำแหน่ง",
-    transfer: "ย้าย",
-  }
-  return map[t] || t
 }
 
 function healthBadge(b: BatchRow): string {
@@ -45,11 +37,11 @@ const columns = [
   }),
   columnHelper.accessor("batchType", {
     header: "ประเภท",
-    cell: (info) => typeLabel(info.getValue()),
+    cell: (info) => getOrderTypeLabel(info.getValue()),
   }),
   columnHelper.accessor("effectiveDate", {
     header: "วันที่มีผล",
-    cell: (info) => <span className="font-mono">{info.getValue() || "—"}</span>,
+    cell: (info) => <span className="whitespace-nowrap">{toThaiDate(info.getValue())}</span>,
   }),
   columnHelper.accessor("totalOrders", {
     header: "ทั้งหมด",

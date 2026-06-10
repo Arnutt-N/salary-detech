@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 
 export function BatchActions({
   batchId,
@@ -39,13 +40,20 @@ export function BatchActions({
       })
 
       if (res.ok) {
+        toast.success(
+          mode === "preview"
+            ? "Preview สำเร็จ"
+            : mode === "reject"
+            ? "Reject ชุดคำสั่งแล้ว"
+            : "Approve สำเร็จ"
+        )
         router.refresh()
       } else {
         const err = await res.json()
-        alert(err.error || "Operation failed")
+        toast.error(err.error || "ดำเนินการไม่สำเร็จ")
       }
     } catch (e) {
-      alert(String(e))
+      toast.error(String(e))
     } finally {
       setLoading(null)
     }

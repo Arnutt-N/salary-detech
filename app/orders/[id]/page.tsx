@@ -2,16 +2,7 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { toThaiDate } from "@/lib/date-utils"
-import { getOrderTypeLabel } from "@/lib/order-types"
-
-const statusLabel: Record<string, string> = {
-  draft: "📝 แบบร่าง",
-  preview: "👁️ ตรวจสอบ",
-  active: "✅ มีผล",
-  cancelled: "🚫 เพิกถอน",
-  superseded: "🔄 ถูกแทนที่",
-  void: "⛔ โมฆะ",
-}
+import { getOrderTypeLabel, getOrderStatusLabel } from "@/lib/order-types"
 
 function FreshnessBadge({ status, label }: { status: string; label: string }) {
   const cls =
@@ -92,7 +83,7 @@ export default async function OrderDetailPage({
             )}
           </div>
           <span className="text-xs px-3 py-1 rounded-full bg-zinc-100">
-            {statusLabel[order.orderStatus] || order.orderStatus}
+            {getOrderStatusLabel(order.orderStatus)}
           </span>
         </div>
 

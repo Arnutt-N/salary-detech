@@ -1,4 +1,4 @@
-# Deploy — Salary Audit (Vercel + Turso)
+# Deploy — Salary Detech (Vercel + Turso)
 
 ## Prerequisites
 

@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma"
+import Link from "next/link"
 import { notFound } from "next/navigation"
+import { getOrderTypeLabel } from "@/lib/order-types"
+import { toThaiDate } from "@/lib/date-utils"
 import { BatchActions } from "./BatchActions"
 import { BatchImportPanel } from "./BatchImportPanel"
 import type { OrderWithPersonMinimal } from "@/lib/types"
@@ -13,7 +16,7 @@ export default async function BatchDetailPage({
   const batch = await prisma.orderBatch.findUnique({
     where: { id: parseInt(id) },
     include: {
-      orders: {
+        orders: {
         select: {
           id: true,
           orderNo: true,
@@ -22,6 +25,8 @@ export default async function BatchDetailPage({
           orderStatus: true,
           statusSalary: true,
           statusLevel: true,
+          statusPosition: true,
+          statusType: true,
           statusOrg: true,
           person: { select: { firstName: true, lastName: true } },
         },
@@ -36,6 +41,13 @@ export default async function BatchDetailPage({
 
   return (
     <div className="max-w-5xl mx-auto p-6">
+      {/* Breadcrumb */}
+      <div className="text-sm text-zinc-400 mb-4">
+        <Link href="/batches" className="hover:underline">ชุดคำสั่ง</Link>
+        {" / "}
+        <span className="text-zinc-700">{batch.batchNo}</span>
+      </div>
+
       <h1 className="text-2xl font-bold mb-2">📦 {batch.batchNo}</h1>
       <p className="text-zinc-500 mb-4">{batch.description || "—"}</p>
 
@@ -73,16 +85,22 @@ export default async function BatchDetailPage({
               const staleFlags = [
                 o.statusSalary,
                 o.statusLevel,
+                o.statusPosition,
+                o.statusType,
                 o.statusOrg,
               ].filter((s) => s === "stale").length
               return (
                 <tr key={o.id} className="border-b hover:bg-zinc-50">
-                  <td className="p-2 font-mono">{o.id}</td>
+                  <td className="p-2 font-mono">
+                    <Link href={`/orders/${o.id}`} className="text-blue-600 hover:underline">
+                      {o.id}
+                    </Link>
+                  </td>
                   <td className="p-2">
                     {o.person?.firstName} {o.person?.lastName}
                   </td>
-                  <td className="p-2">{o.orderType}</td>
-                  <td className="p-2 font-mono">{o.effectiveDate}</td>
+                  <td className="p-2">{getOrderTypeLabel(o.orderType)}</td>
+                  <td className="p-2 whitespace-nowrap">{toThaiDate(o.effectiveDate)}</td>
                   <td className="p-2">{o.orderStatus}</td>
                   <td className="p-2">
                     {staleFlags > 0 ? `🔴 ${staleFlags} stale` : "🟢 ok"}
