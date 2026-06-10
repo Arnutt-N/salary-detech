@@ -18,7 +18,7 @@
 
 | # | ขั้นตอน | ผลที่คาดหวัง | Pass |
 |---|---------|--------------|------|
-| 1.1 | เปิด https://salary-detech.vercel.app/login | หน้า "Salary Audit" + ฟอร์ม ชื่อผู้ใช้/รหัสผ่าน | [ ] |
+| 1.1 | เปิด https://salary-detech.vercel.app/login | หน้า "Salary Detech" + ฟอร์ม ชื่อผู้ใช้/รหัสผ่าน | [ ] |
 | 1.2 | เปิด https://salary-detech.vercel.app/dashboard (ยังไม่ login) | **redirect** ไป `/login?callbackUrl=/dashboard` | [ ] |
 | 1.3 | เปิด https://salary-detech.vercel.app/batches (ยังไม่ login) | **redirect** ไป `/login` | [ ] |
 

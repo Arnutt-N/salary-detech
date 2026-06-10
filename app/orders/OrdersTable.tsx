@@ -4,7 +4,7 @@ import { DataTable } from "@/components/shared/data-table"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
 import { toThaiDate } from "@/lib/date-utils"
-import { getOrderTypeLabel } from "@/lib/order-types"
+import { getOrderTypeLabel, getOrderStatusLabel } from "@/lib/order-types"
 
 export type OrderRow = {
   id: number
@@ -22,24 +22,17 @@ export type OrderRow = {
   statusOrg: string
 }
 
-const statusLabel: Record<string, string> = {
-  draft: "📝 แบบร่าง",
-  preview: "👁️ ตรวจสอบ",
-  active: "✅ มีผล",
-  cancelled: "🚫 เพิกถอน",
-  superseded: "🔄 ถูกแทนที่",
-  void: "⛔ โมฆะ",
-}
-
 function freshnessBadge(order: OrderRow) {
   if (order.orderStatus === "superseded") return { label: "🔴 ถูกแก้ไข", cls: "bg-red-50 text-red-700" }
-  const isStale =
-    order.statusSalary === "stale" ||
-    order.statusPosition === "stale" ||
-    order.statusType === "stale" ||
-    order.statusLevel === "stale" ||
-    order.statusOrg === "stale"
-  if (isStale) return { label: "🟡 stale", cls: "bg-amber-50 text-amber-700" }
+  const flags = [
+    order.statusSalary,
+    order.statusPosition,
+    order.statusType,
+    order.statusLevel,
+    order.statusOrg,
+  ]
+  if (flags.includes("stale")) return { label: "🟡 ต้องแก้ไข", cls: "bg-amber-50 text-amber-700" }
+  if (flags.includes("corrected")) return { label: "🟢 แก้ไขแล้ว", cls: "bg-green-50 text-green-700" }
   return { label: "🟢 ล่าสุด", cls: "bg-green-50 text-green-700" }
 }
 
@@ -83,7 +76,7 @@ const columns = [
     header: "สถานะ",
     cell: (info) => (
       <span className="text-xs px-2 py-1 rounded-full bg-zinc-100">
-        {statusLabel[info.getValue()] || info.getValue()}
+        {getOrderStatusLabel(info.getValue())}
       </span>
     ),
   }),

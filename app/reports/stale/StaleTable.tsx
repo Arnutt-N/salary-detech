@@ -4,6 +4,7 @@ import { DataTable } from "@/components/shared/data-table"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
 import { toThaiDate } from "@/lib/date-utils"
+import { getOrderTypeLabel } from "@/lib/order-types"
 
 export type StaleRow = {
   id: number
@@ -20,25 +21,16 @@ export type StaleRow = {
   statusOrg: string
 }
 
-const typeLabel: Record<string, string> = {
-  salary_increase: "💰 เลื่อนเงินเดือน",
-  special_salary: "💰 เลื่อนพิเศษ",
-  promotion: "📈 เลื่อนตำแหน่ง",
-  transfer: "🔄 ย้าย",
-  transfer_in: "📥 รับโอน",
-  transfer_out: "📤 โอนออก",
-  resign: "👋 ลาออก",
-  retire: "🏁 เกษียณ",
-  education_adjust: "🎓 ปรับวุฒิ",
-  other: "📝 อื่นๆ",
-}
-
 const columnHelper = createColumnHelper<StaleRow>()
 
 const columns = [
   columnHelper.accessor("id", {
     header: "#",
-    cell: (info) => <span className="font-mono text-zinc-400">{info.getValue()}</span>,
+    cell: (info) => (
+      <Link href={`/orders/${info.getValue()}`} className="font-mono text-blue-600 hover:underline">
+        {info.getValue()}
+      </Link>
+    ),
   }),
   columnHelper.accessor("personFirstName", {
     header: "ข้าราชการ",
@@ -55,7 +47,11 @@ const columns = [
   }),
   columnHelper.accessor("orderType", {
     header: "ประเภท",
-    cell: (info) => typeLabel[info.getValue()] || info.getValue(),
+    cell: (info) => (
+      <Link href={`/orders/${info.row.original.id}`} className="hover:underline">
+        {getOrderTypeLabel(info.getValue())}
+      </Link>
+    ),
   }),
   columnHelper.accessor("effectiveDate", {
     header: "วันที่มีผล",

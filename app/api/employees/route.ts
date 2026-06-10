@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { STALE_ORDER_WHERE } from "@/lib/freshness"
 import type { PersonWithCount } from "@/lib/types"
 import { personSchema, personFormToApiBody } from "@/lib/validation/person-schema"
 
@@ -78,17 +79,7 @@ export async function GET(request: NextRequest) {
   const staleOrders =
     personIds.length > 0
       ? await prisma.order.findMany({
-          where: {
-            employeeId: { in: personIds },
-            orderStatus: { in: ["active", "superseded"] },
-            OR: [
-              { statusSalary: "stale" },
-              { statusLevel: "stale" },
-              { statusPosition: "stale" },
-              { statusType: "stale" },
-              { statusOrg: "stale" },
-            ],
-          },
+          where: { employeeId: { in: personIds }, ...STALE_ORDER_WHERE },
           select: { employeeId: true, id: true },
         })
       : []

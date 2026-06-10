@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import { STALE_ORDER_WHERE } from "@/lib/freshness"
 import { EmployeesTable, type EmployeeRow } from "./EmployeesTable"
 import type { PersonListItem } from "@/lib/types"
 
@@ -56,17 +57,7 @@ export default async function EmployeesPage({
   const staleOrders =
     ids.length > 0
       ? await prisma.order.findMany({
-          where: {
-            employeeId: { in: ids },
-            orderStatus: { in: ["active", "superseded"] },
-            OR: [
-              { statusSalary: "stale" },
-              { statusLevel: "stale" },
-              { statusPosition: "stale" },
-              { statusType: "stale" },
-              { statusOrg: "stale" },
-            ],
-          },
+          where: { employeeId: { in: ids }, ...STALE_ORDER_WHERE },
           select: { employeeId: true, id: true },
         })
       : []

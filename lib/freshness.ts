@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client"
 import { prisma } from "./prisma"
 import { compareBusinessDates, maxBusinessDate } from "./date-utils"
 
@@ -35,6 +36,24 @@ export interface PreviewResult {
   byAction: { revise: number; cancel: number }
   maxCascadeDepth: number
   warnings: string[]
+}
+
+/** Freshness flag fields on Order (single source — do not duplicate field lists in pages/routes) */
+export const STALE_FLAG_FIELDS = [
+  "statusSalary",
+  "statusLevel",
+  "statusPosition",
+  "statusType",
+  "statusOrg",
+] as const
+
+/**
+ * Prisma where-clause for "orders that need correction" (คำสั่งที่ต้องแก้ไข).
+ * Use this everywhere instead of re-writing the OR block per page/route.
+ */
+export const STALE_ORDER_WHERE: Prisma.OrderWhereInput = {
+  orderStatus: { in: ["active", "superseded"] },
+  OR: STALE_FLAG_FIELDS.map((f) => ({ [f]: "stale" })),
 }
 
 // ─── Helpers ───

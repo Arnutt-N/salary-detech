@@ -50,3 +50,21 @@ export const ORDER_TYPE_VALUES = ORDER_TYPE_OPTIONS.map((o) => o.value) as [
   OrderType,
   ...OrderType[],
 ]
+
+/** Shared order lifecycle status labels (draft → preview → active → terminal) */
+export const ORDER_STATUS_OPTIONS = [
+  { value: "draft", label: "📝 แบบร่าง" },
+  { value: "preview", label: "👁️ ตรวจสอบ" },
+  { value: "active", label: "✅ มีผล" },
+  { value: "cancelled", label: "🚫 เพิกถอน" },
+  { value: "superseded", label: "🔄 ถูกแทนที่" },
+  { value: "void", label: "⛔ โมฆะ" },
+] as const
+
+const STATUS_LABEL_MAP = Object.fromEntries(
+  ORDER_STATUS_OPTIONS.map((o) => [o.value, o.label])
+) as Record<string, string>
+
+export function getOrderStatusLabel(orderStatus: string): string {
+  return STATUS_LABEL_MAP[orderStatus] ?? orderStatus
+}

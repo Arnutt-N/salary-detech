@@ -1,21 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { STALE_ORDER_WHERE } from "@/lib/freshness"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const page = parseInt(searchParams.get("page") || "1")
   const limit = parseInt(searchParams.get("limit") || "50")
 
-  const where = {
-    orderStatus: { in: ["active", "superseded"] },
-    OR: [
-      { statusSalary: "stale" },
-      { statusLevel: "stale" },
-      { statusPosition: "stale" },
-      { statusType: "stale" },
-      { statusOrg: "stale" },
-    ],
-  }
+  const where = STALE_ORDER_WHERE
 
   const [orders, total] = await Promise.all([
     prisma.order.findMany({

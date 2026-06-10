@@ -1,17 +1,9 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { STALE_ORDER_WHERE } from "@/lib/freshness"
 
 export async function GET() {
-  const staleWhere = {
-    orderStatus: { in: ["active", "superseded"] },
-    OR: [
-      { statusSalary: "stale" },
-      { statusLevel: "stale" },
-      { statusPosition: "stale" },
-      { statusType: "stale" },
-      { statusOrg: "stale" },
-    ],
-  }
+  const staleWhere = STALE_ORDER_WHERE
 
   const [
     totalOrders,

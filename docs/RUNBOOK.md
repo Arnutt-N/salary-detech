@@ -1,4 +1,4 @@
-# Runbook — Salary Audit System
+# Runbook — Salary Detech System
 ## คู่มือสำหรับผู้ดูแลระบบ
 
 ---
@@ -88,5 +88,5 @@
 
 ## 📞 ติดต่อ
 
-- **Repository**: github.com/Arnutt-N/salary-audit
+- **Repository**: github.com/Arnutt-N/salary-detech
 - **ปัญหาเร่งด่วน**: ติดต่อทีม IT
