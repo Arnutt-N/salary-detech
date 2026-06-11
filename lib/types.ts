@@ -37,7 +37,7 @@ export type RecentOrderWithPerson = OrderCore & {
 }
 
 export type StaleOrderWithPerson = OrderCore & {
-  person: PersonName
+  person: PersonLink
 }
 
 export type EmployeeOrderResult = OrderCore & {

@@ -40,7 +40,7 @@ export default async function DashboardPage() {
       statusPosition: true,
       statusType: true,
       statusOrg: true,
-      person: { select: { firstName: true, lastName: true } },
+      person: { select: { id: true, firstName: true, lastName: true } },
     },
   })
 
@@ -194,7 +194,12 @@ export default async function DashboardPage() {
                       className="border-b hover:bg-red-50 text-sm"
                     >
                       <td className="p-3">
-                        {o.person.firstName} {o.person.lastName}
+                        <Link
+                          href={`/employees/${o.person.id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {o.person.firstName} {o.person.lastName}
+                        </Link>
                       </td>
                       <td className="p-3">
                         <Link href={`/orders/${o.id}`} className="hover:underline">
