@@ -31,6 +31,7 @@ export function MainNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
               className={
                 active
                   ? "text-zinc-900 font-medium"
