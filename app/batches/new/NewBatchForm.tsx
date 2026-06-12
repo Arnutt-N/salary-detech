@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { FormField } from "@/components/shared/form-field"
 import { batchSchema, type BatchFormData } from "@/lib/validation/batch-schema"
 
 const batchTypeOptions = [
@@ -58,64 +59,47 @@ export function NewBatchForm() {
       toast.success("สร้างชุดคำสั่งสำเร็จ")
       router.push(`/batches/${batch.id}`)
     } catch {
-      toast.error("สร้างไม่สำเร็จ")
+      toast.error("สร้างไม่สำเร็จ กรุณาลองใหม่")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       <div className="bg-white rounded-xl p-6 shadow-sm border">
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs text-zinc-500">เลขที่ชุด *</label>
-            <input
-              {...register("batchNo")}
-              placeholder="เช่น SAL-APR-2569-001"
-              className="w-full px-3 py-2 border rounded-lg text-sm mt-1"
-            />
-            {errors.batchNo && (
-              <p className="text-xs text-red-500 mt-1">{errors.batchNo.message}</p>
-            )}
-          </div>
-          <div>
-            <label className="text-xs text-zinc-500">ประเภท</label>
-            <select
-              {...register("batchType")}
-              className="w-full px-3 py-2 border rounded-lg text-sm mt-1"
-            >
+          <FormField
+            id="batch-batchNo"
+            label="เลขที่ชุด *"
+            error={errors.batchNo?.message}
+          >
+            <input {...register("batchNo")} placeholder="เช่น SAL-APR-2569-001" required aria-required="true" />
+          </FormField>
+          <FormField id="batch-batchType" label="ประเภท" error={errors.batchType?.message}>
+            <select {...register("batchType")}>
               {batchTypeOptions.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
               ))}
             </select>
-            {errors.batchType && (
-              <p className="text-xs text-red-500 mt-1">{errors.batchType.message}</p>
-            )}
-          </div>
-          <div>
-            <label className="text-xs text-zinc-500">วันที่มีผล</label>
-            <input
-              type="date"
-              {...register("effectiveDate")}
-              className="w-full px-3 py-2 border rounded-lg text-sm mt-1"
-            />
-            {errors.effectiveDate && (
-              <p className="text-xs text-red-500 mt-1">{errors.effectiveDate.message}</p>
-            )}
-          </div>
+          </FormField>
+          <FormField
+            id="batch-effectiveDate"
+            label="วันที่มีผล"
+            error={errors.effectiveDate?.message}
+          >
+            <input type="date" {...register("effectiveDate")} />
+          </FormField>
           <div className="col-span-2">
-            <label className="text-xs text-zinc-500">คำอธิบาย</label>
-            <textarea
-              {...register("description")}
-              rows={3}
-              className="w-full px-3 py-2 border rounded-lg text-sm mt-1"
-            />
-            {errors.description && (
-              <p className="text-xs text-red-500 mt-1">{errors.description.message}</p>
-            )}
+            <FormField
+              id="batch-description"
+              label="คำอธิบาย"
+              error={errors.description?.message}
+            >
+              <textarea {...register("description")} rows={3} />
+            </FormField>
           </div>
         </div>
       </div>
@@ -124,6 +108,7 @@ export function NewBatchForm() {
         <button
           type="submit"
           disabled={loading}
+          aria-busy={loading}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
         >
           📦 สร้างชุดคำสั่ง

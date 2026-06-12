@@ -4,7 +4,7 @@ import { DataTable } from "@/components/shared/data-table"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
 import { toThaiDate } from "@/lib/date-utils"
-import { getOrderTypeLabel } from "@/lib/order-types"
+import { getOrderTypeLabel, getOrderStatusLabel } from "@/lib/order-types"
 
 export type StaleRow = {
   id: number
@@ -82,7 +82,7 @@ const columns = [
     header: "สถานะ",
     cell: (info) => (
       <span className={`text-xs px-2 py-1 rounded-full ${info.getValue() === "superseded" ? "bg-zinc-100 text-zinc-600" : "bg-red-50 text-red-700"}`}>
-        {info.getValue() === "superseded" ? "🔄 ถูกแทนที่" : "🔴 ต้องแก้ไข"}
+        {getOrderStatusLabel(info.getValue())}
       </span>
     ),
   }),

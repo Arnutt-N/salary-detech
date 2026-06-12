@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getOrderTypeLabel } from "@/lib/order-types"
+import { getOrderTypeLabel, getOrderStatusLabel, getBatchStatusLabel, formatStaleDimensionCount, FRESHNESS_COLUMN_LABEL } from "@/lib/order-types"
 import { toThaiDate } from "@/lib/date-utils"
 import { BatchActions } from "./BatchActions"
 import { BatchImportPanel } from "./BatchImportPanel"
@@ -55,9 +55,9 @@ export default async function BatchDetailPage({
         <Stat label="ทั้งหมด" value={batch.totalOrders} />
         <Stat label="✅ ผ่าน" value={batch.cleanOrders} color="text-green-600" />
         <Stat label="⚠️ กระทบ" value={batch.affectedOrders} color="text-amber-600" />
-        <Stat label="🔴 Blocker" value={batch.blockerOrders} color="text-red-600" />
-        <Stat label="🔗 Cascade" value={batch.cascadeTotal} />
-        <Stat label="สถานะ" value={batch.status} testId="batch-status" />
+        <Stat label="🔴 ติดขัด" value={batch.blockerOrders} color="text-red-600" />
+        <Stat label="🔗 กระทบต่อเนื่อง" value={batch.cascadeTotal} />
+        <Stat label="สถานะ" value={getBatchStatusLabel(batch.status)} testId="batch-status" />
       </div>
 
       <BatchImportPanel batchId={batch.id} status={batch.status} />
@@ -75,9 +75,9 @@ export default async function BatchDetailPage({
               <th className="text-left p-2">#</th>
               <th className="text-left p-2">บุคคล</th>
               <th className="text-left p-2">ประเภท</th>
-              <th className="text-left p-2">Effective</th>
+              <th className="text-left p-2">วันที่มีผล</th>
               <th className="text-left p-2">สถานะ</th>
-              <th className="text-left p-2">Freshness</th>
+              <th className="text-left p-2">{FRESHNESS_COLUMN_LABEL}</th>
             </tr>
           </thead>
           <tbody>
@@ -101,10 +101,8 @@ export default async function BatchDetailPage({
                   </td>
                   <td className="p-2">{getOrderTypeLabel(o.orderType)}</td>
                   <td className="p-2 whitespace-nowrap">{toThaiDate(o.effectiveDate)}</td>
-                  <td className="p-2">{o.orderStatus}</td>
-                  <td className="p-2">
-                    {staleFlags > 0 ? `🔴 ${staleFlags} stale` : "🟢 ok"}
-                  </td>
+                  <td className="p-2">{getOrderStatusLabel(o.orderStatus)}</td>
+                  <td className="p-2">{formatStaleDimensionCount(staleFlags)}</td>
                 </tr>
               )
             })}

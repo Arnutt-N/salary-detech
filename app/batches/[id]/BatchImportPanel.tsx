@@ -39,13 +39,13 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
       })
       const data = await res.json()
       if (!res.ok) {
-        toast.error(data.error || "Preview ไม่สำเร็จ")
+        toast.error(data.error || "ตรวจสอบไม่สำเร็จ")
         return
       }
       setPreview(data)
       toast.success(`พบ ${data.summary.ready} แถวพร้อมนำเข้า`)
     } catch {
-      toast.error("Preview ไม่สำเร็จ")
+      toast.error("ตรวจสอบไม่สำเร็จ")
     } finally {
       setLoading(null)
     }
@@ -53,7 +53,7 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
 
   const handleImport = async () => {
     if (!preview?.rows.length) {
-      toast.error("กรุณา Preview ก่อน")
+      toast.error("กรุณาตรวจสอบก่อน")
       return
     }
     const readyRows = preview.rows.filter(
@@ -98,8 +98,11 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
       </p>
       <div className="flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[200px]">
-          <label className="text-xs text-zinc-500">ไฟล์ .xlsx</label>
+          <label htmlFor="batch-import-file" className="text-xs text-zinc-500">
+            ไฟล์ .xlsx
+          </label>
           <input
+            id="batch-import-file"
             type="file"
             data-testid="import-file"
             accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -117,7 +120,7 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
           disabled={!!loading || !file}
           className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50 disabled:opacity-50"
         >
-          {loading === "preview" ? "⏳ กำลังตรวจ..." : "🔍 Preview"}
+          {loading === "preview" ? "⏳ กำลังตรวจ..." : "🔍 ตรวจไฟล์"}
         </button>
         <button
           type="button"

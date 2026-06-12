@@ -87,7 +87,7 @@ export default async function StaleReportPage({
 
       {tableData.length === 0 ? (
         <div className="text-center py-12 text-zinc-400">
-          <p className="text-lg">🎉 ไม่มีคำสั่ง stale</p>
+          <p className="text-lg">🎉 ไม่มีคำสั่งที่ต้องแก้ไข</p>
           <p className="text-sm mt-1">ข้อมูลทั้งหมดเป็นปัจจุบัน</p>
         </div>
       ) : (

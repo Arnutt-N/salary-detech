@@ -109,7 +109,7 @@ export default async function AuditReportPage({
   return (
     <div className="max-w-5xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">
-        📜 ประวัติการเปลี่ยนแปลง (Audit Trail)
+        📜 ประวัติการเปลี่ยนแปลง
       </h1>
 
       {/* Filters */}

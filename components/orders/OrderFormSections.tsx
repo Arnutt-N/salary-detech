@@ -2,6 +2,7 @@
 
 import type { FieldErrors, UseFormRegister } from "react-hook-form"
 import type { OrderFormData } from "@/lib/validation/order-schema"
+import { FormField } from "@/components/shared/form-field"
 import { ORDER_TYPE_OPTIONS } from "@/lib/order-types"
 
 type Register = UseFormRegister<OrderFormData>
@@ -11,11 +12,6 @@ interface OrderFormSectionsProps {
   errors: FieldErrors<OrderFormData>
   showMovementPrior: boolean
   disabled?: boolean
-}
-
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null
-  return <p className="text-xs text-red-500 mt-1">{message}</p>
 }
 
 function SnapshotGrid({
@@ -30,174 +26,165 @@ function SnapshotGrid({
   disabled?: boolean
 }) {
   const isPrior = prefix === "prior"
-  const inputCls = `w-full px-3 py-2 border rounded-lg text-sm mt-1${disabled ? " disabled:bg-zinc-100" : ""}`
+  const id = (name: string) => `order-${prefix}-${name}`
 
   return (
     <div className="grid grid-cols-2 gap-4">
-      <div>
-        <label className="text-xs text-zinc-500">เงินเดือน</label>
+      <FormField
+        id={id("salary")}
+        label="เงินเดือน"
+        error={isPrior ? errors.priorSalary?.message : errors.salary?.message}
+        disabled={disabled}
+      >
         <input
           type="number"
           {...register(isPrior ? "priorSalary" : "salary", { valueAsNumber: true })}
-          disabled={disabled}
-          className={inputCls}
         />
-        <FieldError message={isPrior ? errors.priorSalary?.message : errors.salary?.message} />
-      </div>
-      <div>
-        <label className="text-xs text-zinc-500">เงินเพิ่มการครองชีพชั่วคราว</label>
+      </FormField>
+      <FormField
+        id={id("costOfLivingAllowance")}
+        label="เงินเพิ่มการครองชีพชั่วคราว"
+        error={
+          isPrior
+            ? errors.priorCostOfLivingAllowance?.message
+            : errors.costOfLivingAllowance?.message
+        }
+        disabled={disabled}
+      >
         <input
           type="number"
           {...register(isPrior ? "priorCostOfLivingAllowance" : "costOfLivingAllowance", {
             valueAsNumber: true,
           })}
-          disabled={disabled}
-          className={inputCls}
         />
-        <FieldError
-          message={
-            isPrior ? errors.priorCostOfLivingAllowance?.message : errors.costOfLivingAllowance?.message
-          }
-        />
-      </div>
-      <div>
-        <label className="text-xs text-zinc-500">ค่าตอบแทนพิเศษ</label>
+      </FormField>
+      <FormField
+        id={id("specialCompensation")}
+        label="ค่าตอบแทนพิเศษ"
+        error={
+          isPrior
+            ? errors.priorSpecialCompensation?.message
+            : errors.specialCompensation?.message
+        }
+        disabled={disabled}
+      >
         <input
           type="number"
           {...register(isPrior ? "priorSpecialCompensation" : "specialCompensation", {
             valueAsNumber: true,
           })}
-          disabled={disabled}
-          className={inputCls}
         />
-        <FieldError
-          message={
-            isPrior ? errors.priorSpecialCompensation?.message : errors.specialCompensation?.message
-          }
-        />
-      </div>
+      </FormField>
       {!isPrior && (
         <>
-          <div>
-            <label className="text-xs text-zinc-500">เงินประจำตำแหน่ง</label>
+          <FormField
+            id={id("positionAllowance")}
+            label="เงินประจำตำแหน่ง"
+            error={errors.positionAllowance?.message}
+            disabled={disabled}
+          >
             <input
               type="number"
               {...register("positionAllowance", { valueAsNumber: true })}
-              disabled={disabled}
-              className={inputCls}
             />
-            <FieldError message={errors.positionAllowance?.message} />
-          </div>
-          <div>
-            <label className="text-xs text-zinc-500">ค่าตอบแทนนอกเหนือจากเงินเดือน</label>
+          </FormField>
+          <FormField
+            id={id("compensationBeyondSalary")}
+            label="ค่าตอบแทนนอกเหนือจากเงินเดือน"
+            error={errors.compensationBeyondSalary?.message}
+            disabled={disabled}
+          >
             <input
               type="number"
               {...register("compensationBeyondSalary", { valueAsNumber: true })}
-              disabled={disabled}
-              className={inputCls}
             />
-            <FieldError message={errors.compensationBeyondSalary?.message} />
-          </div>
+          </FormField>
         </>
       )}
-      <div>
-        <label className="text-xs text-zinc-500">เงินเดือน ณ วันที่</label>
+      <FormField
+        id={id("salaryAsOfDate")}
+        label="เงินเดือน ณ วันที่"
+        error={isPrior ? errors.priorSalaryAsOfDate?.message : errors.salaryAsOfDate?.message}
+        disabled={disabled}
+      >
         <input
           type="date"
           {...register(isPrior ? "priorSalaryAsOfDate" : "salaryAsOfDate")}
-          disabled={disabled}
-          className={inputCls}
         />
-        <FieldError
-          message={isPrior ? errors.priorSalaryAsOfDate?.message : errors.salaryAsOfDate?.message}
-        />
-      </div>
-      <div>
-        <label className="text-xs text-zinc-500">ตำแหน่ง</label>
-        <input
-          {...register(isPrior ? "priorPositionName" : "positionName")}
-          disabled={disabled}
-          className={inputCls}
-        />
-        <FieldError
-          message={isPrior ? errors.priorPositionName?.message : errors.positionName?.message}
-        />
-      </div>
-      <div>
-        <label className="text-xs text-zinc-500">ประเภทตำแหน่ง</label>
-        <input
-          {...register(isPrior ? "priorPositionType" : "positionType")}
-          disabled={disabled}
-          className={inputCls}
-        />
-        <FieldError
-          message={isPrior ? errors.priorPositionType?.message : errors.positionType?.message}
-        />
-      </div>
-      <div>
-        <label className="text-xs text-zinc-500">ระดับ</label>
-        <input
-          {...register(isPrior ? "priorPositionLevel" : "positionLevel")}
-          disabled={disabled}
-          className={inputCls}
-        />
-        <FieldError
-          message={isPrior ? errors.priorPositionLevel?.message : errors.positionLevel?.message}
-        />
-      </div>
-      <div>
-        <label className="text-xs text-zinc-500">เลขที่ตำแหน่ง</label>
-        <input
-          {...register(isPrior ? "priorPositionNo" : "positionNo")}
-          disabled={disabled}
-          className={inputCls}
-        />
-        <FieldError message={isPrior ? errors.priorPositionNo?.message : errors.positionNo?.message} />
-      </div>
-      <div>
-        <label className="text-xs text-zinc-500">สังกัด</label>
-        <input
-          {...register(isPrior ? "priorBureau" : "bureau")}
-          disabled={disabled}
-          className={inputCls}
-        />
-        <FieldError message={isPrior ? errors.priorBureau?.message : errors.bureau?.message} />
-      </div>
-      <div>
-        <label className="text-xs text-zinc-500">กอง</label>
-        <input
-          {...register(isPrior ? "priorDivision" : "division")}
-          disabled={disabled}
-          className={inputCls}
-        />
-        <FieldError message={isPrior ? errors.priorDivision?.message : errors.division?.message} />
-      </div>
-      <div>
-        <label className="text-xs text-zinc-500">ต่ำกว่าสำนัก/กอง 1 ระดับ</label>
-        <input
-          {...register(isPrior ? "priorSubDivision" : "subDivision")}
-          disabled={disabled}
-          className={inputCls}
-        />
-        <FieldError message={isPrior ? errors.priorSubDivision?.message : errors.subDivision?.message} />
-      </div>
-      <div>
-        <label className="text-xs text-zinc-500">กรม</label>
-        <input
-          {...register(isPrior ? "priorDepartment" : "department")}
-          disabled={disabled}
-          className={inputCls}
-        />
-        <FieldError message={isPrior ? errors.priorDepartment?.message : errors.department?.message} />
-      </div>
+      </FormField>
+      <FormField
+        id={id("positionName")}
+        label="ตำแหน่ง"
+        error={isPrior ? errors.priorPositionName?.message : errors.positionName?.message}
+        disabled={disabled}
+      >
+        <input {...register(isPrior ? "priorPositionName" : "positionName")} />
+      </FormField>
+      <FormField
+        id={id("positionType")}
+        label="ประเภทตำแหน่ง"
+        error={isPrior ? errors.priorPositionType?.message : errors.positionType?.message}
+        disabled={disabled}
+      >
+        <input {...register(isPrior ? "priorPositionType" : "positionType")} />
+      </FormField>
+      <FormField
+        id={id("positionLevel")}
+        label="ระดับ"
+        error={isPrior ? errors.priorPositionLevel?.message : errors.positionLevel?.message}
+        disabled={disabled}
+      >
+        <input {...register(isPrior ? "priorPositionLevel" : "positionLevel")} />
+      </FormField>
+      <FormField
+        id={id("positionNo")}
+        label="เลขที่ตำแหน่ง"
+        error={isPrior ? errors.priorPositionNo?.message : errors.positionNo?.message}
+        disabled={disabled}
+      >
+        <input {...register(isPrior ? "priorPositionNo" : "positionNo")} />
+      </FormField>
+      <FormField
+        id={id("bureau")}
+        label="สังกัด"
+        error={isPrior ? errors.priorBureau?.message : errors.bureau?.message}
+        disabled={disabled}
+      >
+        <input {...register(isPrior ? "priorBureau" : "bureau")} />
+      </FormField>
+      <FormField
+        id={id("division")}
+        label="กอง"
+        error={isPrior ? errors.priorDivision?.message : errors.division?.message}
+        disabled={disabled}
+      >
+        <input {...register(isPrior ? "priorDivision" : "division")} />
+      </FormField>
+      <FormField
+        id={id("subDivision")}
+        label="ต่ำกว่าสำนัก/กอง 1 ระดับ"
+        error={isPrior ? errors.priorSubDivision?.message : errors.subDivision?.message}
+        disabled={disabled}
+      >
+        <input {...register(isPrior ? "priorSubDivision" : "subDivision")} />
+      </FormField>
+      <FormField
+        id={id("department")}
+        label="กรม"
+        error={isPrior ? errors.priorDepartment?.message : errors.department?.message}
+        disabled={disabled}
+      >
+        <input {...register(isPrior ? "priorDepartment" : "department")} />
+      </FormField>
       <div className="col-span-2">
-        <label className="text-xs text-zinc-500">กระทรวง</label>
-        <input
-          {...register(isPrior ? "priorMinistry" : "ministry")}
+        <FormField
+          id={id("ministry")}
+          label="กระทรวง"
+          error={isPrior ? errors.priorMinistry?.message : errors.ministry?.message}
           disabled={disabled}
-          className={inputCls}
-        />
-        <FieldError message={isPrior ? errors.priorMinistry?.message : errors.ministry?.message} />
+        >
+          <input {...register(isPrior ? "priorMinistry" : "ministry")} />
+        </FormField>
       </div>
     </div>
   )
@@ -209,41 +196,56 @@ export function OrderFormSections({
   showMovementPrior,
   disabled,
 }: OrderFormSectionsProps) {
-  const inputCls = `w-full px-3 py-2 border rounded-lg text-sm mt-1${disabled ? " disabled:bg-zinc-100" : ""}`
-
   return (
     <>
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-xs text-zinc-500">ประเภทคำสั่ง</label>
-          <select {...register("orderType")} disabled={disabled} className={inputCls}>
+        <FormField
+          id="order-orderType"
+          label="ประเภทคำสั่ง"
+          error={errors.orderType?.message}
+          disabled={disabled}
+        >
+          <select {...register("orderType")}>
             {ORDER_TYPE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
             ))}
           </select>
-          <FieldError message={errors.orderType?.message} />
-        </div>
-        <div>
-          <label className="text-xs text-zinc-500">เลขที่คำสั่ง</label>
-          <input {...register("orderNo")} disabled={disabled} className={inputCls} />
-          <FieldError message={errors.orderNo?.message} />
-        </div>
-        <div>
-          <label className="text-xs text-zinc-500">วันที่ลงคำสั่ง</label>
-          <input type="date" {...register("issueDate")} disabled={disabled} className={inputCls} />
-          <FieldError message={errors.issueDate?.message} />
-        </div>
-        <div>
-          <label className="text-xs text-zinc-500">วันที่มีผล *</label>
-          <input type="date" {...register("effectiveDate")} disabled={disabled} className={inputCls} />
-          <FieldError message={errors.effectiveDate?.message} />
-        </div>
+        </FormField>
+        <FormField
+          id="order-orderNo"
+          label="เลขที่คำสั่ง"
+          error={errors.orderNo?.message}
+          disabled={disabled}
+        >
+          <input {...register("orderNo")} />
+        </FormField>
+        <FormField
+          id="order-issueDate"
+          label="วันที่ลงคำสั่ง"
+          error={errors.issueDate?.message}
+          disabled={disabled}
+        >
+          <input type="date" {...register("issueDate")} />
+        </FormField>
+        <FormField
+          id="order-effectiveDate"
+          label="วันที่มีผล *"
+          error={errors.effectiveDate?.message}
+          disabled={disabled}
+        >
+          <input type="date" {...register("effectiveDate")} />
+        </FormField>
         <div className="col-span-2">
-          <label className="text-xs text-zinc-500">หมายเหตุ</label>
-          <textarea {...register("note")} disabled={disabled} rows={2} className={inputCls} />
-          <FieldError message={errors.note?.message} />
+          <FormField
+            id="order-note"
+            label="หมายเหตุ"
+            error={errors.note?.message}
+            disabled={disabled}
+          >
+            <textarea {...register("note")} rows={2} />
+          </FormField>
         </div>
       </div>
 

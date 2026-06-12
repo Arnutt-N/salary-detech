@@ -4,7 +4,7 @@ import { DataTable } from "@/components/shared/data-table"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
 import { toThaiDate } from "@/lib/date-utils"
-import { getOrderTypeLabel, getOrderStatusLabel } from "@/lib/order-types"
+import { getOrderTypeLabel, getOrderStatusLabel, FRESHNESS_COLUMN_LABEL } from "@/lib/order-types"
 
 export type OrderRow = {
   id: number
@@ -81,7 +81,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("statusSalary", {
-    header: "Freshness",
+    header: FRESHNESS_COLUMN_LABEL,
     cell: (info) => {
       const badge = freshnessBadge(info.row.original)
       return (

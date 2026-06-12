@@ -18,7 +18,7 @@ export type BatchRow = {
 }
 
 function healthBadge(b: BatchRow): string {
-  if (b.blockerOrders > 0) return "🔴 มี blocker"
+  if (b.blockerOrders > 0) return "🔴 มีรายการติดขัด"
   if (b.affectedOrders > 0) return "🟡 มีผลกระทบ"
   if (b.totalOrders === 0) return "⚪ ยังไม่มีคำสั่ง"
   return "🟢 ผ่านทั้งหมด"
@@ -56,7 +56,7 @@ const columns = [
     cell: (info) => <span className="text-center block text-amber-600">{info.getValue()}</span>,
   }),
   columnHelper.accessor("blockerOrders", {
-    header: "blocker",
+    header: "ติดขัด",
     cell: (info) => <span className="text-center block text-red-600">{info.getValue()}</span>,
   }),
   columnHelper.accessor("totalOrders", {

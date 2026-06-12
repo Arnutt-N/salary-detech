@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { href: "/orders", label: "📋 คำสั่ง" },
   { href: "/batches", label: "📦 ชุดคำสั่ง" },
   { href: "/reports/stale", label: "🚨 ต้องแก้ไข" },
-  { href: "/reports/audit", label: "📜 Audit" },
+  { href: "/reports/audit", label: "📜 ประวัติการเปลี่ยนแปลง" },
 ]
 
 export function MainNav() {
