@@ -42,18 +42,18 @@ export function BatchActions({
       if (res.ok) {
         toast.success(
           mode === "preview"
-            ? "Preview สำเร็จ"
+            ? "ตรวจสอบสำเร็จ"
             : mode === "reject"
-            ? "Reject ชุดคำสั่งแล้ว"
-            : "Approve สำเร็จ"
+            ? "ปฏิเสธชุดคำสั่งแล้ว"
+            : "อนุมัติสำเร็จ"
         )
         router.refresh()
       } else {
         const err = await res.json()
         toast.error(err.error || "ดำเนินการไม่สำเร็จ")
       }
-    } catch (e) {
-      toast.error(String(e))
+    } catch {
+      toast.error("ดำเนินการไม่สำเร็จ กรุณาลองใหม่")
     } finally {
       setLoading(null)
     }
@@ -72,7 +72,7 @@ export function BatchActions({
           disabled={!!loading}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
-          {loading === "preview" ? "⏳ Previewing..." : "🔍 Preview"}
+          {loading === "preview" ? "⏳ กำลังตรวจ..." : "🔍 ตรวจผลกระทบ"}
         </button>
       )}
       {canApprove && (
@@ -84,7 +84,7 @@ export function BatchActions({
             disabled={!!loading}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
           >
-            ✅ Approve All
+            ✅ อนุมัติทั้งหมด
           </button>
           {hasBlockers && (
             <button
@@ -92,7 +92,7 @@ export function BatchActions({
               disabled={!!loading}
               className="bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 disabled:opacity-50"
             >
-              ⚠️ Approve Clean Only
+              ⚠️ อนุมัติเฉพาะที่ผ่าน
             </button>
           )}
           <button
@@ -100,7 +100,7 @@ export function BatchActions({
             disabled={!!loading}
             className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50"
           >
-            ❌ Reject
+            ❌ ปฏิเสธชุด
           </button>
         </>
       )}

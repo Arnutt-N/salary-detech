@@ -68,3 +68,42 @@ const STATUS_LABEL_MAP = Object.fromEntries(
 export function getOrderStatusLabel(orderStatus: string): string {
   return STATUS_LABEL_MAP[orderStatus] ?? orderStatus
 }
+
+/** Batch workflow status labels (draft → previewed → approved) */
+export const BATCH_STATUS_OPTIONS = [
+  { value: "draft", label: "📝 แบบร่าง" },
+  { value: "previewed", label: "👁️ ตรวจสอบแล้ว" },
+  { value: "approved", label: "✅ อนุมัติแล้ว" },
+  { value: "cancelled", label: "🚫 ยกเลิก" },
+] as const
+
+const BATCH_STATUS_LABEL_MAP = Object.fromEntries(
+  BATCH_STATUS_OPTIONS.map((o) => [o.value, o.label])
+) as Record<string, string>
+
+export function getBatchStatusLabel(status: string): string {
+  return BATCH_STATUS_LABEL_MAP[status] ?? status
+}
+
+/** Freshness flag labels on order snapshot fields */
+export const FRESHNESS_FLAG_OPTIONS = [
+  { value: "latest", label: "🟢 ล่าสุด" },
+  { value: "stale", label: "🟡 ต้องแก้ไข" },
+  { value: "corrected", label: "🔴 แก้ไขแล้ว" },
+] as const
+
+const FRESHNESS_FLAG_LABEL_MAP = Object.fromEntries(
+  FRESHNESS_FLAG_OPTIONS.map((o) => [o.value, o.label])
+) as Record<string, string>
+
+export function getFreshnessFlagLabel(status: string): string {
+  return FRESHNESS_FLAG_LABEL_MAP[status] ?? status
+}
+
+/** Table column header shared across order/batch lists */
+export const FRESHNESS_COLUMN_LABEL = "ความทันสมัย"
+
+/** Summary when multiple freshness dimensions are stale on one order */
+export function formatStaleDimensionCount(count: number): string {
+  return count > 0 ? `🔴 ${count} มิติต้องแก้` : "🟢 ผ่าน"
+}

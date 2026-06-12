@@ -140,7 +140,7 @@ export function NewOrderForm() {
       const data = await res.json()
       setPreview(data)
     } catch {
-      toast.error("Preview ไม่สำเร็จ")
+      toast.error("ตรวจสอบไม่สำเร็จ")
     } finally {
       setLoading(false)
     }
@@ -234,7 +234,7 @@ export function NewOrderForm() {
 
       {preview && (
         <div className="bg-white rounded-xl p-6 shadow-sm border">
-          <h2 className="text-lg font-bold mb-4">👁️ ผล Preview</h2>
+          <h2 className="text-lg font-bold mb-4">👁️ ผลตรวจกระทบ</h2>
           <p className="text-sm mb-2">กระทบ {preview.totalAffected} คำสั่ง</p>
           {preview.affectedOrders?.map((o) => (
             <div key={o.id} className="text-sm py-1 border-b last:border-0">
@@ -256,7 +256,7 @@ export function NewOrderForm() {
           disabled={loading}
           className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50 disabled:opacity-50"
         >
-          🔍 Preview Impact
+          🔍 ตรวจผลกระทบ
         </button>
         <button
           type="button"

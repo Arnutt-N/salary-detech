@@ -60,7 +60,7 @@ export default async function DashboardPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <Card label="คำสั่งทั้งหมด" value={totalOrders} href="/orders" />
-        <Card label="Active" value={activeOrders} href="/orders?status=active" />
+        <Card label="คำสั่งมีผล" value={activeOrders} href="/orders?status=active" />
         <Card
           label="ต้องแก้ไข"
           value={staleCount}

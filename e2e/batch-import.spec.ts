@@ -26,7 +26,7 @@ test.describe("batch import workflow", () => {
     await expect(page).toHaveURL(/\/dashboard/)
 
     await page.goto(`/batches/${runtime.batchId}`)
-    await expect(page.getByTestId("batch-status")).toContainText("draft")
+    await expect(page.getByTestId("batch-status")).toContainText("แบบร่าง")
 
     await page.getByTestId("import-file").setInputFiles(sampleXlsx)
     await page.getByTestId("import-preview").click()
@@ -36,15 +36,15 @@ test.describe("batch import workflow", () => {
     await expect(page.locator("tbody tr")).toHaveCount(2, { timeout: 30_000 })
 
     await page.getByTestId("batch-preview").click()
-    await expect(page.getByTestId("batch-status")).toContainText("previewed", {
+    await expect(page.getByTestId("batch-status")).toContainText("ตรวจสอบแล้ว", {
       timeout: 30_000,
     })
 
     await page.getByTestId("batch-approve-all").click()
-    await expect(page.getByTestId("batch-status")).toContainText("approved", {
+    await expect(page.getByTestId("batch-status")).toContainText("อนุมัติแล้ว", {
       timeout: 30_000,
     })
 
-    await expect(page.locator("tbody tr").first()).toContainText("active")
+    await expect(page.locator("tbody tr").first()).toContainText("มีผล")
   })
 })

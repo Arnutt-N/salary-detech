@@ -24,7 +24,7 @@ function statusBadge(isActive: boolean, staleCount: number) {
   if (!isActive)
     return { label: "⚪ ไม่ประจำการ", cls: "bg-gray-100 text-gray-600" }
   if (staleCount > 0)
-    return { label: "🔴 มีคำสั่ง stale", cls: "bg-red-50 text-red-700" }
+    return { label: "🔴 มีคำสั่งต้องแก้", cls: "bg-red-50 text-red-700" }
   return { label: "🟢 ข้อมูลล่าสุด", cls: "bg-green-50 text-green-700" }
 }
 
