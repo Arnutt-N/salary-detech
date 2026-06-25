@@ -25,16 +25,34 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ```
 app/           # Pages + API routes (App Router)
   proxy.ts     # Auth gate (Next 16 proxy — not middleware.ts)
+  layout.tsx   # force-dynamic, global nav, Sonner toaster
   dashboard/, employees/, orders/, batches/, reports/, login/
-  api/         # REST handlers
+  api/         # REST handlers — see below
+components/
+  shared/      # data-table, form-field, main-nav, user-nav
+  employees/, orders/  # page-specific form sections
 lib/
   freshness.ts # Core domain: stale checks, preview, cascade
   prisma.ts    # Singleton client; prefers TURSO_DATABASE_URL
-  auth.ts, date-utils.ts, types.ts, validation/
+  excel-import/ # Workbook parse → date parse → employee resolve → import
+  batch-orders.ts, order-payload.ts, order-types.ts # Order helpers
+  citizen-id.ts, dashboard-stats.ts, date-utils.ts
+  auth.ts, types.ts, utils.ts, validation/
 prisma/        # schema.prisma (10 models), seed.ts
-__tests__/     # freshness + API tests; fixtures in __tests__/fixtures/
-docs/          # PRDs, plans, RUNBOOK.md
+__tests__/     # freshness + excel + API tests; fixtures in __tests__/fixtures/
+                # run.ts is the CI entry point (orders test files)
+docs/          # PRDs (docs/prd), plans (docs/plans), RUNBOOK/DEPLOY/SMOKE-TEST
 ```
+
+### API routes (`app/api/`)
+
+- `orders/`, `employees/`, `batches/` — REST CRUD + `[id]/` detail.
+- `batches/[id]/preview`, `approve` — batch freshness preview + activation.
+- `batches/[id]/import`, `import/preview` — Excel batch import (see below).
+- `dashboard/summary`, `stale`, `activity` — dashboard widgets.
+- `reports/audit`, `reports/stale/export` — audit log + stale CSV export.
+- `preview` — ad-hoc impact preview for an unsaved order.
+- `cron/cleanup-previews` — scheduled cleanup; auth via `CRON_SECRET` bearer.
 
 Domain spec: `hr-order-freshness-check-v2.md`. Roadmap: `PRP.md`.
 
@@ -45,7 +63,8 @@ Domain spec: `hr-order-freshness-check-v2.md`. Roadmap: `PRP.md`.
 - **Order lifecycle**: `draft` → preview → `active` → `cancelled` / `superseded` / `void`.
 - **OrderBatch**: ชุดคำสั่ง; workflow draft → preview → approved.
 - **EmployeeChangeLog**: source of truth for current level/position/org after active orders.
-- **Freshness engine** (`lib/freshness.ts`): `isOrderStale`, `validateOrderFreshness`, `previewImpact`, `cascadeStaleCheck`, `hasDependency`. Always use these when creating/activating orders — do not duplicate stale logic in routes or UI.
+- **Freshness engine** (`lib/freshness.ts`): `isOrderStale`, `validateOrderFreshness`, `previewImpact`, `cascadeStaleCheck`, `hasDependency`, `getCurrentLevel/Position/Org`, `getApplicableAdjustments`. Always use these when creating/activating orders — do not duplicate stale logic in routes or UI.
+- **Supporting models** (10 total): `SalaryBaseAdjustment` + `SalaryAdjustmentApplicant` (เลื่อนเงินเดือนฐาน), `EmployeeEducationAdjustment` (ปรับวุฒิ), `CompensationRound` + `CompensationDisbursement` + `CompensationToSalary` (ค่าตอบแทน) feed `getApplicableAdjustments`.
 
 Common `orderType` values: `salary_increase`, `special_salary`, `promotion`, `transfer`, `resign`, `salary_cap_adjustment`, `salary_apr`, `salary_oct`, `salary_entitlement`, `salary_qualification`, `appointment`.
 
@@ -79,12 +98,19 @@ Order salary snapshot fields (Thai labels in `hr-order-freshness-check-v2.md` §
 
 ### Forms
 
-- Schemas in `lib/validation/` (`orderSchema`, batch schemas). Error messages in Thai.
+- Schemas in `lib/validation/` (`order-schema`, `batch-schema`, `person-schema`). Error messages in Thai.
+
+### Excel batch import
+
+- Pipeline lives in `lib/excel-import/`: `parse-workbook` (reads `movement` / `salary` / `resign` sheets via `exceljs`) → `parse-date` (Thai พ.ศ. dates) → `resolve-employees` (match by normalized citizenId, `lib/citizen-id.ts`) → API import.
+- Column headers are Thai and mapped in `parse-workbook.ts`; order-type labels resolve via `order-type-labels.ts`.
+- Flow: upload to a batch → `api/batches/[id]/import/preview` (dry-run) → `api/batches/[id]/import` (create draft orders) → batch preview/approve. Sample template: `docs/templates/template-salary-detect.xlsx`.
 
 ### Auth
 
-- `ADMIN_USERNAME` / `ADMIN_PASSWORD` / `AUTH_SECRET` from env — never hardcode credentials.
+- `ADMIN_USERNAME` / `ADMIN_PASSWORD` / `AUTH_SECRET` / `AUTH_TRUST_HOST` from env — never hardcode credentials.
 - `lib/auth.ts` denies all logins if `ADMIN_PASSWORD` is unset.
+- `CRON_SECRET` gates `app/api/cron/*` (Vercel Cron bearer token). See `.env.example` for the full list.
 
 ### UI
 
@@ -96,14 +122,19 @@ Order salary snapshot fields (Thai labels in `hr-order-freshness-check-v2.md` §
 
 ```bash
 npm run dev              # local dev (SQLite dev.db by default)
+npm run dev:turso        # dev against local Turso (libsql://localhost:8080)
 npm run build && npm run lint
-npm run test:e2e:full  # build + Playwright batch import flow
-npm run test:e2e       # Playwright only (requires prior build)
-npx prisma db push && npx tsx prisma/seed.ts
-npx tsx __tests__/run.ts # full test suite (CI)
+npx tsx __tests__/run.ts # full unit/integration suite — CI entry point
+npm test                 # all *.test.ts via tsx --test (ad-hoc)
+npm run test:freshness   # engine tests only
+npm run test:api         # API route tests only
+npm run test:e2e:full    # build + Playwright batch import flow
+npm run test:e2e         # Playwright only (requires prior build)
+npm run db:push          # prisma db push (alias); db:push:turso for libSQL
+npx prisma db push && npx tsx prisma/seed.ts   # reset + seed dev.db
 ```
 
-Default seed login: `admin` / `password` (change in production).
+CI (`.github/workflows/ci.yml`): generate → db push → lint → build → seed → `__tests__/run.ts` → tsc, then a separate Playwright E2E job. Default seed login: `admin` / `password` (change in production).
 
 ## When changing behavior
 
