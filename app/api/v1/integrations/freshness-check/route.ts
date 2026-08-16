@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import type { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { isOrderStale } from "@/lib/freshness"
 
@@ -9,7 +10,7 @@ import { isOrderStale } from "@/lib/freshness"
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { orderIds, employeeIds, dateAsOf } = body
+    const { orderIds, employeeIds } = body
 
     if (!orderIds && !employeeIds) {
       return NextResponse.json(
@@ -18,11 +19,11 @@ export async function POST(req: Request) {
       )
     }
 
-    const whereClause: any = { orderStatus: "active" }
+    const whereClause: Prisma.OrderWhereInput = { orderStatus: "active" }
     if (orderIds && Array.isArray(orderIds)) {
-      whereClause.id = { in: orderIds.map((id: any) => Number(id)) }
+      whereClause.id = { in: orderIds.map((id: unknown) => Number(id)) }
     } else if (employeeIds && Array.isArray(employeeIds)) {
-      whereClause.employeeId = { in: employeeIds.map((id: any) => Number(id)) }
+      whereClause.employeeId = { in: employeeIds.map((id: unknown) => Number(id)) }
     }
 
     const orders = await prisma.order.findMany({
@@ -75,9 +76,9 @@ export async function POST(req: Request) {
       },
       data: evaluated,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { success: false, error: error?.message || "Internal server error" },
+      { success: false, error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     )
   }

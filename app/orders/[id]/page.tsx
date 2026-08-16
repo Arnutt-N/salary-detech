@@ -41,7 +41,7 @@ export default async function OrderDetailPage({
 
   const field = (label: string, value?: string | number | null) => (
     <div>
-      <p className="text-xs text-zinc-400">{label}</p>
+      <p className="text-xs text-zinc-500">{label}</p>
       <p className="text-sm font-medium mt-0.5">{value != null ? String(value) : "—"}</p>
     </div>
   )
@@ -51,7 +51,7 @@ export default async function OrderDetailPage({
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-6">
       {/* Breadcrumb */}
-      <div className="text-sm text-zinc-400">
+      <div className="text-sm text-zinc-500">
         <Link href="/orders" className="hover:underline">คำสั่ง</Link>
         {" / "}
         <span className="text-zinc-700">#{order.id} {order.orderNo || ""}</span>
@@ -68,7 +68,7 @@ export default async function OrderDetailPage({
               <p className="mt-1 text-sm text-zinc-500">เลขที่: {order.orderNo}</p>
             )}
           </div>
-          <span className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-zinc-100 px-3 text-xs">
+          <span className="inline-flex shrink-0 items-center rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-800">
             {getOrderStatusLabel(order.orderStatus)}
           </span>
         </div>

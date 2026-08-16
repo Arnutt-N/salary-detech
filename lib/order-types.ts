@@ -96,7 +96,8 @@ const FRESHNESS_FLAG_LABEL_MAP = Object.fromEntries(
   FRESHNESS_FLAG_OPTIONS.map((o) => [o.value, o.label])
 ) as Record<string, string>
 
-export function getFreshnessFlagLabel(status: string): string {
+export function getFreshnessFlagLabel(status: string | null | undefined): string {
+  if (!status) return "—"
   return FRESHNESS_FLAG_LABEL_MAP[status] ?? status
 }
 
@@ -107,7 +108,8 @@ const FRESHNESS_FLAG_PLAIN_LABEL_MAP: Record<string, string> = {
 }
 
 /** Plain Thai status text without emoji (UI badges, aria-label) */
-export function getFreshnessFlagPlainLabel(status: string): string {
+export function getFreshnessFlagPlainLabel(status: string | null | undefined): string {
+  if (!status) return "—"
   return FRESHNESS_FLAG_PLAIN_LABEL_MAP[status] ?? status
 }
 

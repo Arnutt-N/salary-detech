@@ -62,11 +62,11 @@ export async function POST(req: Request) {
         results.cascaded += cascadeCount
 
         results.created++
-      } catch (err: any) {
+      } catch (err: unknown) {
         results.errors.push({
           comNo: raw.com_no,
           citizenId: raw.per_cardno,
-          error: err?.message || "Failed to import order",
+          error: err instanceof Error ? err.message : "Failed to import order",
         })
       }
     }
@@ -75,9 +75,9 @@ export async function POST(req: Request) {
       success: true,
       data: results,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { success: false, error: error?.message || "Internal server error" },
+      { success: false, error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     )
   }

@@ -36,6 +36,7 @@ export async function POST(
         errors.push(`แถว ${row.sheet}:${row.rowNumber} — ไม่พร้อมนำเข้า`)
         continue
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { citizenId: _c, personName: _p, ...orderFields } = row.order
       orders.push({
         ...orderFields,

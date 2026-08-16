@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { UserNav } from "@/components/shared/user-nav"
 
 const NAV_ITEMS = [
@@ -25,11 +25,13 @@ function navLinkClass(active: boolean, block = false) {
 
 export function MainNav() {
   const pathname = usePathname()
+  const [prevPathname, setPrevPathname] = useState(pathname)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  useEffect(() => {
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname)
     setMenuOpen(false)
-  }, [pathname])
+  }
 
   if (pathname === "/login") return null
 
@@ -39,7 +41,7 @@ export function MainNav() {
       aria-label="เมนูหลัก"
     >
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="flex h-14 items-center gap-2 sm:gap-3">
+        <div className="flex h-12 items-center gap-2 sm:gap-3">
           <Link
             href="/dashboard"
             className="shrink-0 text-sm font-bold text-zinc-900 sm:text-base"

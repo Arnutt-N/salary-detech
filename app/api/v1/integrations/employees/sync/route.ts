@@ -54,10 +54,10 @@ export async function POST(req: Request) {
           })
           results.created++
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         results.errors.push({
           citizenId: raw.per_cardno,
-          error: err?.message || "Failed to process record",
+          error: err instanceof Error ? err.message : "Failed to process record",
         })
       }
     }
@@ -66,9 +66,9 @@ export async function POST(req: Request) {
       success: true,
       data: results,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { success: false, error: error?.message || "Internal server error" },
+      { success: false, error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     )
   }
