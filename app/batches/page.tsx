@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { BatchesTable, type BatchRow } from "./BatchesTable"
+import { EmptyState } from "@/components/shared/empty-state"
 
 export default async function BatchesPage() {
   const batches = await prisma.orderBatch.findMany({
@@ -19,21 +20,21 @@ export default async function BatchesPage() {
   }))
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">📦 ชุดคำสั่ง (Batches)</h1>
-        <Link
-          href="/batches/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
+        <Link href="/batches/new" className="btn-primary">
           + สร้างชุดใหม่
         </Link>
       </div>
 
       {tableData.length === 0 ? (
-        <div className="text-center py-12 text-zinc-400">
-          <p className="text-lg">ยังไม่มีชุดคำสั่ง</p>
-        </div>
+        <EmptyState
+          icon="📦"
+          title="ยังไม่มีชุดคำสั่ง"
+          description="ชุดคำสั่งช่วยนำเข้าและอนุมัติหลายคำสั่งพร้อมกัน พร้อม preview ผลกระทบก่อนเปิดใช้"
+          action={{ href: "/batches/new", label: "สร้างชุดคำสั่งแรก" }}
+        />
       ) : (
         <BatchesTable data={tableData} />
       )}

@@ -3,6 +3,7 @@ import Link from "next/link"
 import { STALE_ORDER_WHERE } from "@/lib/freshness"
 import { ORDER_TYPE_OPTIONS } from "@/lib/order-types"
 import { StaleTable, type StaleRow } from "./StaleTable"
+import { EmptyState } from "@/components/shared/empty-state"
 
 export default async function StaleReportPage({
   searchParams,
@@ -47,34 +48,38 @@ export default async function StaleReportPage({
   }))
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6">
       <h1 className="text-2xl font-bold mb-4">🚨 คำสั่งที่ต้องแก้ไข</h1>
 
       {/* Filters */}
-      <form className="mb-4 p-4 bg-white rounded-lg border">
-        <div className="flex gap-2 items-end">
-          <select name="type" defaultValue={type} className="px-3 py-2 border rounded-lg text-sm">
+      <form className="mb-4 rounded-lg border bg-white p-4">
+        <div className="flex flex-wrap items-end gap-2">
+          <select
+            name="type"
+            defaultValue={type}
+            className="input-touch"
+          >
             <option value="">ทุกประเภท</option>
             {ORDER_TYPE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+          <button type="submit" className="btn-primary">
             กรอง
           </button>
-          <Link href="/reports/stale" className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50">
+          <Link href="/reports/stale" className="btn-secondary">
             ล้าง
           </Link>
-          <div className="flex-1" />
+          <div className="hidden flex-1 sm:block" />
           <a
             href={`/api/reports/stale/export?format=xlsx${type ? `&type=${type}` : ""}`}
-            className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50"
+            className="btn-secondary"
           >
             📥 Excel
           </a>
           <a
             href={`/api/reports/stale/export?format=csv${type ? `&type=${type}` : ""}`}
-            className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50"
+            className="btn-secondary"
           >
             📥 CSV
           </a>
@@ -86,10 +91,20 @@ export default async function StaleReportPage({
       </p>
 
       {tableData.length === 0 ? (
-        <div className="text-center py-12 text-zinc-400">
-          <p className="text-lg">🎉 ไม่มีคำสั่งที่ต้องแก้ไข</p>
-          <p className="text-sm mt-1">ข้อมูลทั้งหมดเป็นปัจจุบัน</p>
-        </div>
+        type ? (
+          <EmptyState
+            icon="🔍"
+            title="ไม่พบคำสั่งที่ต้องแก้ไขในประเภทนี้"
+            description="ลองเลือกประเภทอื่น หรือล้างตัวกรองเพื่อดูทั้งหมด"
+            action={{ href: "/reports/stale", label: "ล้างตัวกรอง", variant: "secondary" }}
+          />
+        ) : (
+          <EmptyState
+            icon="✅"
+            title="ไม่มีคำสั่งที่ต้องแก้ไข"
+            description="ข้อมูลในคำสั่งทั้งหมดตรงกับข้อเท็จจริง ณ วันที่มีผล"
+          />
+        )
       ) : (
         <StaleTable data={tableData} />
       )}
@@ -99,7 +114,7 @@ export default async function StaleReportPage({
         {currentPage > 1 && (
           <Link
             href={`/reports/stale?page=${currentPage - 1}${type ? `&type=${type}` : ""}`}
-            className="px-3 py-1 text-sm border rounded hover:bg-zinc-100"
+            className="pagination-link"
           >
             ← ก่อนหน้า
           </Link>
@@ -107,7 +122,7 @@ export default async function StaleReportPage({
         {currentPage < totalPages && (
           <Link
             href={`/reports/stale?page=${currentPage + 1}${type ? `&type=${type}` : ""}`}
-            className="px-3 py-1 text-sm border rounded hover:bg-zinc-100"
+            className="pagination-link"
           >
             ถัดไป →
           </Link>

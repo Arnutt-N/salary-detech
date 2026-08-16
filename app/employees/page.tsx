@@ -3,6 +3,7 @@ import Link from "next/link"
 import { STALE_ORDER_WHERE } from "@/lib/freshness"
 import { EmployeesTable, type EmployeeRow } from "./EmployeesTable"
 import type { PersonListItem } from "@/lib/types"
+import { EmptyState } from "@/components/shared/empty-state"
 
 const PAGE_SIZE = 50
 
@@ -85,28 +86,22 @@ export default async function EmployeesPage({
   }))
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-4">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">👥 ข้าราชการทั้งหมด</h1>
-        <Link
-          href="/employees/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
-        >
+        <Link href="/employees/new" className="btn-primary">
           ➕ เพิ่มข้าราชการ
         </Link>
       </div>
 
-      <form className="mb-4 flex gap-2">
+      <form className="mb-4 flex flex-wrap gap-2">
         <input
           name="search"
           defaultValue={search}
           placeholder="ค้นหาชื่อ-นามสกุล หรือเลขบัตรประชาชน..."
-          className="flex-1 px-3 py-2 border rounded-lg text-sm"
+          className="input-touch min-w-0 flex-1"
         />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
-        >
+        <button type="submit" className="btn-primary shrink-0">
           ค้นหา
         </button>
       </form>
@@ -116,18 +111,21 @@ export default async function EmployeesPage({
       </p>
 
       {tableData.length === 0 ? (
-        <div className="text-center py-12 text-zinc-400">
-          <p className="text-lg">ยังไม่มีข้อมูลข้าราชการ</p>
-          <p className="text-sm mt-1">
-            เริ่มต้นด้วยการเพิ่มข้อมูลข้าราชการในระบบ
-          </p>
-          <Link
-            href="/employees/new"
-            className="inline-block mt-4 text-blue-600 hover:underline text-sm"
-          >
-            ➕ เพิ่มข้าราชการคนแรก
-          </Link>
-        </div>
+        search ? (
+          <EmptyState
+            icon="🔍"
+            title="ไม่พบข้าราชการที่ตรงกับคำค้นหา"
+            description="ลองค้นหาด้วยชื่อ นามสกุล หรือเลขบัตรประชาชนอีกครั้ง"
+            action={{ href: "/employees", label: "ล้างคำค้นหา", variant: "secondary" }}
+          />
+        ) : (
+          <EmptyState
+            icon="👥"
+            title="ยังไม่มีข้อมูลข้าราชการ"
+            description="เพิ่มข้อมูลข้าราชการก่อนสร้างหรือนำเข้าคำสั่ง เพื่อให้ระบบตรวจความถูกต้องได้"
+            action={{ href: "/employees/new", label: "เพิ่มข้าราชการคนแรก" }}
+          />
+        )
       ) : (
         <EmployeesTable data={tableData} />
       )}
@@ -137,7 +135,7 @@ export default async function EmployeesPage({
         {currentPage > 1 && (
           <Link
             href={`/employees?page=${currentPage - 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`}
-            className="px-3 py-1 text-sm border rounded hover:bg-zinc-100"
+            className="pagination-link"
           >
             ← ก่อนหน้า
           </Link>
@@ -145,7 +143,7 @@ export default async function EmployeesPage({
         {currentPage < totalPages && (
           <Link
             href={`/employees?page=${currentPage + 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`}
-            className="px-3 py-1 text-sm border rounded hover:bg-zinc-100"
+            className="pagination-link"
           >
             ถัดไป →
           </Link>

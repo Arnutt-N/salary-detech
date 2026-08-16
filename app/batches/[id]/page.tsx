@@ -1,7 +1,14 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getOrderTypeLabel, getOrderStatusLabel, getBatchStatusLabel, formatStaleDimensionCount, FRESHNESS_COLUMN_LABEL } from "@/lib/order-types"
+import {
+  getOrderTypeLabel,
+  getOrderStatusLabel,
+  getBatchStatusLabel,
+  formatStaleDimensionCount,
+  countStaleDimensions,
+  FRESHNESS_COLUMN_LABEL,
+} from "@/lib/order-types"
 import { toThaiDate } from "@/lib/date-utils"
 import { BatchActions } from "./BatchActions"
 import { BatchImportPanel } from "./BatchImportPanel"
@@ -28,7 +35,7 @@ export default async function BatchDetailPage({
           statusPosition: true,
           statusType: true,
           statusOrg: true,
-          person: { select: { firstName: true, lastName: true } },
+          person: { select: { id: true, firstName: true, lastName: true } },
         },
         orderBy: { effectiveDate: "desc" },
       },
@@ -40,9 +47,9 @@ export default async function BatchDetailPage({
   const orders = batch.orders as OrderWithPersonMinimal[]
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6">
       {/* Breadcrumb */}
-      <div className="text-sm text-zinc-400 mb-4">
+      <div className="text-sm text-zinc-600 mb-4">
         <Link href="/batches" className="hover:underline">ชุดคำสั่ง</Link>
         {" / "}
         <span className="text-zinc-700">{batch.batchNo}</span>
@@ -51,7 +58,7 @@ export default async function BatchDetailPage({
       <h1 className="text-2xl font-bold mb-2">📦 {batch.batchNo}</h1>
       <p className="text-zinc-500 mb-4">{batch.description || "—"}</p>
 
-      <div className="grid grid-cols-6 gap-4 mb-6">
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
         <Stat label="ทั้งหมด" value={batch.totalOrders} />
         <Stat label="✅ ผ่าน" value={batch.cleanOrders} color="text-green-600" />
         <Stat label="⚠️ กระทบ" value={batch.affectedOrders} color="text-amber-600" />
@@ -68,8 +75,8 @@ export default async function BatchDetailPage({
         hasBlockers={batch.blockerOrders > 0}
       />
 
-      <div className="bg-white rounded-lg shadow overflow-hidden mt-6">
-        <table className="w-full text-sm">
+      <div className="mt-6 overflow-x-auto rounded-lg bg-white shadow">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="bg-zinc-50 border-b">
             <tr>
               <th className="text-left p-2">#</th>
@@ -82,22 +89,27 @@ export default async function BatchDetailPage({
           </thead>
           <tbody>
             {orders.map((o) => {
-              const staleFlags = [
-                o.statusSalary,
-                o.statusLevel,
-                o.statusPosition,
-                o.statusType,
-                o.statusOrg,
-              ].filter((s) => s === "stale").length
+              const staleFlags = countStaleDimensions(o)
               return (
                 <tr key={o.id} className="border-b hover:bg-zinc-50">
                   <td className="p-2 font-mono">
-                    <Link href={`/orders/${o.id}`} className="text-blue-600 hover:underline">
+                    <Link href={`/orders/${o.id}`} className="text-blue-700 hover:underline">
                       {o.id}
                     </Link>
                   </td>
                   <td className="p-2">
-                    {o.person?.firstName} {o.person?.lastName}
+                    {o.person?.id ? (
+                      <Link
+                        href={`/employees/${o.person.id}`}
+                        className="text-blue-700 hover:underline"
+                      >
+                        {o.person.firstName} {o.person.lastName}
+                      </Link>
+                    ) : (
+                      <>
+                        {o.person?.firstName} {o.person?.lastName}
+                      </>
+                    )}
                   </td>
                   <td className="p-2">{getOrderTypeLabel(o.orderType)}</td>
                   <td className="p-2 whitespace-nowrap">{toThaiDate(o.effectiveDate)}</td>

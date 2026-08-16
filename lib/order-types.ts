@@ -100,10 +100,47 @@ export function getFreshnessFlagLabel(status: string): string {
   return FRESHNESS_FLAG_LABEL_MAP[status] ?? status
 }
 
+const FRESHNESS_FLAG_PLAIN_LABEL_MAP: Record<string, string> = {
+  latest: "ล่าสุด",
+  stale: "ต้องแก้ไข",
+  corrected: "แก้ไขแล้ว",
+}
+
+/** Plain Thai status text without emoji (UI badges, aria-label) */
+export function getFreshnessFlagPlainLabel(status: string): string {
+  return FRESHNESS_FLAG_PLAIN_LABEL_MAP[status] ?? status
+}
+
+/** CTA label for the stale orders report */
+export const STALE_REPORT_ACTION_LABEL = "เปิดรายงานต้องแก้ไข"
+
 /** Table column header shared across order/batch lists */
 export const FRESHNESS_COLUMN_LABEL = "ความทันสมัย"
 
 /** Summary when multiple freshness dimensions are stale on one order */
 export function formatStaleDimensionCount(count: number): string {
   return count > 0 ? `🔴 ${count} มิติต้องแก้` : "🟢 ผ่าน"
+}
+
+type StaleDimensionSource = {
+  statusSalary: string | null
+  statusLevel: string | null
+  statusPosition: string | null
+  statusType: string | null
+  statusOrg: string | null
+}
+
+/** Thai labels for each stale freshness dimension on an order snapshot */
+export function getStaleDimensionLabels(order: StaleDimensionSource): string[] {
+  const labels: string[] = []
+  if (order.statusSalary === "stale") labels.push("💰 เงินเดือน")
+  if (order.statusLevel === "stale") labels.push("📊 ระดับ")
+  if (order.statusPosition === "stale") labels.push("📋 ตำแหน่ง")
+  if (order.statusType === "stale") labels.push("🏷️ ประเภท")
+  if (order.statusOrg === "stale") labels.push("🏢 สังกัด")
+  return labels
+}
+
+export function countStaleDimensions(order: StaleDimensionSource): number {
+  return getStaleDimensionLabels(order).length
 }

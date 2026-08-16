@@ -24,6 +24,11 @@ model Person {
   salarySystemType            String?  @map("salary_system_type")
   currentQualification        String?  @map("current_qualification")
   qualificationEffectiveDate  String?  @map("qualification_effective_date")
+  gender                      String?  @map("gender") // เพศ (1: ชาย, 2: หญิง)
+  birthDate                   String?  @map("birth_date") // วันเกิด YYYY-MM-DD
+  startDate                   String?  @map("start_date") // วันบรรจุรับราชการ YYYY-MM-DD
+  retireDate                  String?  @map("retire_date") // วันเกษียณอายุราชการ YYYY-MM-DD
+  positionNo                  String?  @map("position_no") // เลขที่ตำแหน่งปัจจุบัน
   isActive                    Boolean  @default(true) @map("is_active")
   createdAt                   DateTime @default(now()) @map("created_at")
 
@@ -46,6 +51,10 @@ model Order {
   orderNo            String?  @map("order_no")
   issueDate          String   @map("issue_date")
   effectiveDate      String   @map("effective_date")
+  movementCode       String?  @map("movement_code") // รหัสการเคลื่อนไหว mov_code (DPIS)
+  cmdSeq             Int?     @map("cmd_seq") // ลำดับที่ในบัญชีแนบท้ายคำสั่ง
+  percentUp          Float?   @map("percent_up") // เปอร์เซ็นต์ที่เลื่อนเงินเดือน
+  salaryStep         Float?   @map("salary_step") // ขั้นเงินเดือน (กรณีระบบขั้น)
 
   // Data Snapshot — salary components (Thai labels in hr-order-freshness-check-v2.md §2.1)
   salary                    Float?   @map("salary") // เงินเดือน

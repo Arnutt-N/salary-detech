@@ -68,7 +68,7 @@ export function NewBatchForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       <div className="bg-white rounded-xl p-6 shadow-sm border">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField
             id="batch-batchNo"
             label="เลขที่ชุด *"
@@ -104,19 +104,19 @@ export function NewBatchForm() {
         </div>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <button
           type="submit"
           disabled={loading}
           aria-busy={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           📦 สร้างชุดคำสั่ง
         </button>
         <button
           type="button"
           onClick={() => router.push("/batches")}
-          className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50"
+          className="btn-secondary"
         >
           ↩️ ยกเลิก
         </button>

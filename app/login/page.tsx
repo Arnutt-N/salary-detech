@@ -35,7 +35,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white">
-      <div className="w-full max-w-sm space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+      <div className="w-full max-w-sm space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="text-center">
           <h1 className="text-xl font-semibold text-gray-900">Salary Detech</h1>
           <p className="mt-1 text-sm text-gray-500">ระบบตรวจสอบคำสั่งข้าราชการ</p>
@@ -51,7 +51,7 @@ export default function LoginPage() {
               name="username"
               type="text"
               required
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500/20"
+              className="input-touch mt-1 block w-full shadow-sm focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500/20"
               placeholder="admin"
             />
           </div>
@@ -65,7 +65,7 @@ export default function LoginPage() {
               name="password"
               type="password"
               required
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500/20"
+              className="input-touch mt-1 block w-full shadow-sm focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500/20"
               placeholder="••••••"
             />
           </div>
@@ -79,7 +79,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-gray-800 disabled:opacity-50"
+            className="btn-touch w-full bg-gray-900 font-medium text-white shadow-sm hover:bg-gray-800 disabled:opacity-50"
           >
             {loading ? "กำลังเข้าระบบ..." : "เข้าระบบ"}
           </button>

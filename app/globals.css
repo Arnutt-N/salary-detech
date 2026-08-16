@@ -8,3 +8,25 @@
 body {
   font-family: var(--font-sans);
 }
+
+@layer components {
+  .btn-touch {
+    @apply inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-3 text-sm;
+  }
+
+  .pagination-link {
+    @apply inline-flex min-h-11 items-center justify-center rounded border px-4 text-sm hover:bg-zinc-100;
+  }
+
+  .btn-secondary {
+    @apply inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border px-3 text-sm hover:bg-zinc-50;
+  }
+
+  .btn-primary {
+    @apply inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg bg-blue-600 px-3 text-sm text-white hover:bg-blue-700;
+  }
+
+  .input-touch {
+    @apply min-h-11 rounded-lg border px-3 text-sm;
+  }
+}

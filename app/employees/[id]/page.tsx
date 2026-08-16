@@ -5,6 +5,7 @@ import type { EmployeeOrderResult, ChangeLogWithOrder } from "@/lib/types"
 import { formatCitizenId } from "@/lib/citizen-id"
 import { STALE_ORDER_WHERE } from "@/lib/freshness"
 import { getOrderTypeLabel } from "@/lib/order-types"
+import { EmptyState } from "@/components/shared/empty-state"
 import { toThaiDate } from "@/lib/date-utils"
 
 const fieldLabel: Record<string, string> = {
@@ -105,7 +106,7 @@ export default async function EmployeeDetailPage({
   )
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-8">
       {/* Breadcrumb */}
       <div className="text-sm text-zinc-400">
         <Link href="/employees" className="hover:underline">
@@ -118,20 +119,20 @@ export default async function EmployeeDetailPage({
       </div>
 
       {/* Snapshot Card */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h1 className="text-2xl font-bold">
+      <div className="rounded-xl border bg-white p-4 shadow-sm sm:p-6">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-balance">
               {person.nameTitle} {person.firstName} {person.lastName}
             </h1>
             <p className="text-sm text-zinc-400 font-mono mt-1">
               เลขบัตร: {formatCitizenId(person.citizenId)}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`/employees/${person.id}/edit`}
-              className="text-sm px-3 py-1 border rounded-lg hover:bg-zinc-50"
+              className="btn-secondary text-sm"
             >
               ✏️ แก้ไข
             </Link>
@@ -147,7 +148,7 @@ export default async function EmployeeDetailPage({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+        <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2 md:grid-cols-3">
           {field("ตำแหน่ง", person.currentPositionName)}
           {field("ระดับ", person.currentPositionLevel)}
           {field("ประเภท", person.currentPositionType)}
@@ -175,7 +176,12 @@ export default async function EmployeeDetailPage({
           📋 ประวัติคำสั่ง ({orders.length})
         </h2>
         {orders.length === 0 ? (
-          <p className="text-zinc-400 text-sm">ยังไม่มีคำสั่ง</p>
+          <EmptyState
+            icon="📋"
+            title="ยังไม่มีคำสั่งสำหรับข้าราชการคนนี้"
+            description="สร้างคำสั่งใหม่เพื่อบันทึกการเปลี่ยนแปลงและให้ระบบตรวจความถูกต้องของ snapshot"
+            action={{ href: "/orders/new", label: "สร้างคำสั่งใหม่" }}
+          />
         ) : (
           <div className="space-y-1">
             {orders.map((o) => {
@@ -191,7 +197,7 @@ export default async function EmployeeDetailPage({
                 <Link
                   key={o.id}
                   href={`/orders/${o.id}`}
-                  className="flex items-center gap-4 px-4 py-3 rounded-lg border bg-white hover:shadow-sm transition-shadow"
+                  className="flex min-h-11 items-center gap-4 rounded-lg border bg-white px-4 py-3 transition-shadow hover:shadow-sm"
                 >
                   <span className="text-lg">{icon}</span>
                   <div className="flex-1 min-w-0">
@@ -219,12 +225,19 @@ export default async function EmployeeDetailPage({
       <section>
         <h2 className="text-lg font-bold mb-4">📝 ประวัติการเปลี่ยนแปลง</h2>
         {changes.length === 0 ? (
-          <p className="text-zinc-400 text-sm">
-            ยังไม่มีประวัติการเปลี่ยนแปลง
-          </p>
+          <EmptyState
+            icon="📝"
+            title="ยังไม่มีประวัติการเปลี่ยนแปลง"
+            description="เมื่อมีคำสั่งเปิดใช้ ระบบจะบันทึกการเปลี่ยนแปลงตำแหน่ง ระดับ หรือสังกัดที่นี่"
+            action={{
+              href: `/reports/audit?search=${encodeURIComponent(`${person.firstName ?? ""} ${person.lastName ?? ""}`.trim())}`,
+              label: "ดู audit ทั้งหมด",
+              variant: "secondary",
+            }}
+          />
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="w-full">
+          <div className="overflow-x-auto rounded-lg bg-white shadow">
+            <table className="w-full min-w-[640px]">
               <thead className="bg-zinc-50 border-b">
                 <tr>
                   <th className="text-left p-3 text-sm font-medium">วันที่</th>

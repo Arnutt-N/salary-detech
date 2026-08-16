@@ -49,6 +49,25 @@ const MOVEMENT_COLUMNS: ColumnMap = {
   "คำสั่งลงวันที่": "issueDate",
   "เงินประจำตำแหน่ง": "positionAllowance",
   "ค่าตอบแทนนอกเหนือจากเงินเดือน": "compensationBeyondSalary",
+  // DPIS / Database column names
+  per_cardno: "citizenId",
+  citizen_id: "citizenId",
+  com_no: "orderNo",
+  order_no: "orderNo",
+  com_date: "issueDate",
+  issue_date: "issueDate",
+  cmd_date: "effectiveDate",
+  effective_date: "effectiveDate",
+  mov_code: "movementCode",
+  movement_code: "movementCode",
+  cmd_seq: "cmdSeq",
+  cmd_old_salary: "priorSalary",
+  cmd_salary: "salary",
+  cmd_spsalary: "specialCompensation",
+  cmd_position: "priorPositionName",
+  cmd_level: "priorPositionLevel",
+  pos_no: "positionNo",
+  pos_name: "positionName",
 }
 
 const SINGLE_SNAPSHOT_COLUMNS: ColumnMap = {
@@ -73,6 +92,22 @@ const SINGLE_SNAPSHOT_COLUMNS: ColumnMap = {
   "คำสั่งลงวันที่": "issueDate",
   "เงินประจำตำแหน่ง": "positionAllowance",
   "ค่าตอบแทนนอกเหนือจากเงินเดือน": "compensationBeyondSalary",
+  // DPIS / Database column names
+  per_cardno: "citizenId",
+  citizen_id: "citizenId",
+  com_no: "orderNo",
+  order_no: "orderNo",
+  com_date: "issueDate",
+  issue_date: "issueDate",
+  cmd_date: "effectiveDate",
+  effective_date: "effectiveDate",
+  mov_code: "movementCode",
+  movement_code: "movementCode",
+  cmd_seq: "cmdSeq",
+  cmd_salary: "salary",
+  cmd_spsalary: "specialCompensation",
+  pos_no: "positionNo",
+  pos_name: "positionName",
 }
 
 function normalizeHeader(value: unknown): string {

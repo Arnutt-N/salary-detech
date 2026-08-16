@@ -15,7 +15,7 @@ export default async function EditEmployeePage({
   if (!person) notFound()
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className="max-w-3xl mx-auto p-4 sm:p-6">
       <h1 className="text-2xl font-bold mb-6">
         ✏️ แก้ไขข้อมูล — {person.firstName} {person.lastName}
       </h1>

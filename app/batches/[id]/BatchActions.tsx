@@ -63,14 +63,14 @@ export function BatchActions({
   const canApprove = status === "previewed"
 
   return (
-    <div className="flex gap-2 mb-6">
+    <div className="mb-6 flex flex-wrap gap-2">
       {canPreview && (
         <button
           type="button"
           data-testid="batch-preview"
           onClick={() => action("preview")}
           disabled={!!loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          className="btn-touch bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {loading === "preview" ? "⏳ กำลังตรวจ..." : "🔍 ตรวจผลกระทบ"}
         </button>
@@ -82,7 +82,7 @@ export function BatchActions({
             data-testid="batch-approve-all"
             onClick={() => action("approve-all")}
             disabled={!!loading}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
+            className="btn-touch bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
           >
             ✅ อนุมัติทั้งหมด
           </button>
@@ -90,7 +90,7 @@ export function BatchActions({
             <button
               onClick={() => action("approve-clean")}
               disabled={!!loading}
-              className="bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 disabled:opacity-50"
+              className="btn-touch bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-50"
             >
               ⚠️ อนุมัติเฉพาะที่ผ่าน
             </button>
@@ -98,7 +98,7 @@ export function BatchActions({
           <button
             onClick={() => action("reject")}
             disabled={!!loading}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50"
+            className="btn-touch bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
           >
             ❌ ปฏิเสธชุด
           </button>

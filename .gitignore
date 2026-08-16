@@ -8,3 +8,6 @@ playwright-report/
 test-results/
 blob-report/
 e2e/.runtime.json
+secrets/
+
+project-log-md/

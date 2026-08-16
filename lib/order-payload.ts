@@ -9,6 +9,10 @@ export interface OrderInputBody {
   orderNo?: Nullable<string>
   issueDate?: string
   effectiveDate?: string
+  movementCode?: Nullable<string>
+  cmdSeq?: Nullable<number>
+  percentUp?: Nullable<number>
+  salaryStep?: Nullable<number>
   orderStatus?: string
   salary?: Nullable<number>
   costOfLivingAllowance?: Nullable<number>
@@ -54,6 +58,10 @@ export function orderInputToCreateData(body: OrderInputBody) {
     orderNo: orNull(body.orderNo),
     issueDate: body.issueDate!,
     effectiveDate: body.effectiveDate!,
+    movementCode: orNull(body.movementCode),
+    cmdSeq: orNull(body.cmdSeq),
+    percentUp: orNull(body.percentUp),
+    salaryStep: orNull(body.salaryStep),
     salary: orNull(body.salary),
     costOfLivingAllowance: orNull(body.costOfLivingAllowance),
     specialCompensation: orNull(body.specialCompensation),

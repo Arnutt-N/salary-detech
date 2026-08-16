@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   description: "ระบบตรวจสอบความถูกต้องของข้อมูลในคำสั่งข้าราชการ",
 }
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+}
+
 export const dynamic = 'force-dynamic'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -22,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-gray-50 font-sans antialiased">
+      <body className="min-h-screen bg-gray-50 font-sans antialiased pb-[max(0px,env(safe-area-inset-bottom))]">
         <SessionProvider>
           <a
             href="#main-content"

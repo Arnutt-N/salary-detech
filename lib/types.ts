@@ -59,7 +59,7 @@ export interface OrderWithPersonMinimal {
   statusPosition: string | null
   statusType: string | null
   statusOrg: string | null
-  person?: PersonName | null
+  person?: PersonLink | null
 }
 
 export interface PersonListItem {

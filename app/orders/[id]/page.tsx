@@ -3,21 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { toThaiDate } from "@/lib/date-utils"
 import { getOrderTypeLabel, getOrderStatusLabel } from "@/lib/order-types"
-
-function FreshnessBadge({ status, label }: { status: string; label: string }) {
-  const cls =
-    status === "stale"
-      ? "bg-amber-50 text-amber-700"
-      : status === "corrected"
-      ? "bg-red-50 text-red-700"
-      : "bg-green-50 text-green-700"
-  const icon = status === "stale" ? "🟡" : status === "corrected" ? "🔴" : "🟢"
-  return (
-    <span className={`text-xs px-2 py-1 rounded-full ${cls}`}>
-      {icon} {label}
-    </span>
-  )
-}
+import { FreshnessDimensionBadge } from "@/components/shared/freshness-badge"
 
 export default async function OrderDetailPage({
   params,
@@ -63,7 +49,7 @@ export default async function OrderDetailPage({
   const canEdit = ["draft", "active"].includes(order.orderStatus)
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-6">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-6">
       {/* Breadcrumb */}
       <div className="text-sm text-zinc-400">
         <Link href="/orders" className="hover:underline">คำสั่ง</Link>
@@ -72,22 +58,22 @@ export default async function OrderDetailPage({
       </div>
 
       {/* Order Info Card */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h1 className="text-2xl font-bold">
+      <div className="rounded-xl border bg-white p-4 shadow-sm sm:p-6">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-balance">
               {getOrderTypeLabel(order.orderType)}
             </h1>
             {order.orderNo && (
-              <p className="text-sm text-zinc-500 mt-1">เลขที่: {order.orderNo}</p>
+              <p className="mt-1 text-sm text-zinc-500">เลขที่: {order.orderNo}</p>
             )}
           </div>
-          <span className="text-xs px-3 py-1 rounded-full bg-zinc-100">
+          <span className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-zinc-100 px-3 text-xs">
             {getOrderStatusLabel(order.orderStatus)}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+        <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2 md:grid-cols-3">
           {field("วันที่ลงคำสั่ง", toThaiDate(order.issueDate))}
           {field("วันที่มีผล", toThaiDate(order.effectiveDate))}
           {field("เงินเดือน", order.salary ? `${order.salary.toLocaleString()} บาท` : null)}
@@ -104,20 +90,20 @@ export default async function OrderDetailPage({
       </div>
 
       {/* Freshness Status */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border">
-        <h2 className="text-lg font-bold mb-4">🔍 สถานะความถูกต้อง</h2>
+      <div className="rounded-xl border bg-white p-4 shadow-sm sm:p-6">
+        <h2 className="mb-4 text-lg font-bold">🔍 สถานะความถูกต้อง</h2>
         <div className="flex flex-wrap gap-3">
-          <FreshnessBadge status={order.statusSalary} label="เงินเดือน" />
-          <FreshnessBadge status={order.statusPosition} label="ตำแหน่ง" />
-          <FreshnessBadge status={order.statusType} label="ประเภท" />
-          <FreshnessBadge status={order.statusLevel} label="ระดับ" />
-          <FreshnessBadge status={order.statusOrg} label="สังกัด" />
+          <FreshnessDimensionBadge status={order.statusSalary} dimension="เงินเดือน" />
+          <FreshnessDimensionBadge status={order.statusPosition} dimension="ตำแหน่ง" />
+          <FreshnessDimensionBadge status={order.statusType} dimension="ประเภท" />
+          <FreshnessDimensionBadge status={order.statusLevel} dimension="ระดับ" />
+          <FreshnessDimensionBadge status={order.statusOrg} dimension="สังกัด" />
         </div>
       </div>
 
       {/* Correction Chain */}
       {(correctedFromOrder || correctedOrders.length > 0) && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border">
+        <div className="rounded-xl border bg-white p-4 shadow-sm sm:p-6">
           <h2 className="text-lg font-bold mb-4">🔗 สายการแก้ไข</h2>
           <div className="space-y-2 text-sm">
             {correctedFromOrder && (
@@ -146,19 +132,13 @@ export default async function OrderDetailPage({
       )}
 
       {/* Actions */}
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         {canEdit && (
-          <Link
-            href={`/orders/${order.id}/edit`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
-          >
+          <Link href={`/orders/${order.id}/edit`} className="btn-primary">
             ✏️ แก้ไข
           </Link>
         )}
-        <Link
-          href="/orders"
-          className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50"
-        >
+        <Link href="/orders" className="btn-secondary">
           ↩️ กลับ
         </Link>
       </div>

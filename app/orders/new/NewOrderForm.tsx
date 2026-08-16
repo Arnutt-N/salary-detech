@@ -183,30 +183,30 @@ export function NewOrderForm() {
     <div className="space-y-6">
       <div className="bg-white rounded-xl p-6 shadow-sm border">
         <h2 className="text-lg font-bold mb-4">👤 เลือกข้าราชการ</h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <input
             value={employeeSearch}
             onChange={(e) => setEmployeeSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleSearch())}
             placeholder="ค้นหาชื่อ..."
-            className="flex-1 px-3 py-2 border rounded-lg text-sm"
+            className="input-touch min-w-0 flex-1"
           />
           <button
             type="button"
             onClick={handleSearch}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+            className="btn-primary shrink-0"
           >
             ค้นหา
           </button>
         </div>
         {searchResults.length > 0 && (
-          <div className="mt-2 border rounded-lg divide-y max-h-48 overflow-y-auto">
+          <div className="mt-2 max-h-48 divide-y overflow-y-auto rounded-lg border">
             {searchResults.map((p) => (
               <button
                 key={p.id}
                 type="button"
                 onClick={() => selectPerson(p)}
-                className="w-full text-left px-3 py-2 hover:bg-zinc-50 text-sm"
+                className="min-h-11 w-full px-3 text-left text-sm hover:bg-zinc-50"
               >
                 {p.firstName} {p.lastName} — {p.currentPositionName || "—"}
               </button>
@@ -249,12 +249,12 @@ export function NewOrderForm() {
         </div>
       )}
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <button
           type="button"
           onClick={handlePreview}
           disabled={loading}
-          className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50 disabled:opacity-50"
+          className="btn-secondary disabled:opacity-50"
         >
           🔍 ตรวจผลกระทบ
         </button>
@@ -262,7 +262,7 @@ export function NewOrderForm() {
           type="button"
           onClick={onDraft}
           disabled={loading}
-          className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50 disabled:opacity-50"
+          className="btn-secondary disabled:opacity-50"
         >
           💾 บันทึกแบบร่าง
         </button>
@@ -270,7 +270,7 @@ export function NewOrderForm() {
           type="button"
           onClick={onActive}
           disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           ✅ บันทึกและเปิดใช้
         </button>

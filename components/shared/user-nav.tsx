@@ -7,23 +7,26 @@ export function UserNav() {
   const { data: session, status } = useSession()
 
   if (status === "loading") {
-    return <div className="h-4 w-16 animate-pulse rounded bg-gray-200" />
+    return <div className="h-11 w-16 animate-pulse rounded bg-gray-200" />
   }
 
   if (!session) {
     return (
-      <Link href="/login" className="text-zinc-400 hover:text-zinc-600 text-xs">
+      <Link href="/login" className="btn-touch text-xs text-zinc-600 hover:text-zinc-900">
         เข้าสู่ระบบ
       </Link>
     )
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs text-zinc-500">{session.user?.name}</span>
+    <div className="flex items-center gap-1 sm:gap-2">
+      <span className="hidden max-w-[8rem] truncate text-xs text-zinc-500 sm:inline">
+        {session.user?.name}
+      </span>
       <button
+        type="button"
         onClick={() => signOut({ callbackUrl: "/login" })}
-        className="text-xs text-zinc-400 hover:text-red-500 transition-colors"
+        className="btn-touch text-xs text-zinc-600 transition-colors hover:text-red-600"
       >
         ออกจากระบบ
       </button>

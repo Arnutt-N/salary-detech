@@ -87,7 +87,7 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border mb-6">
+    <div className="mb-6 rounded-xl border bg-white p-4 shadow-sm sm:p-6">
       <h2 className="text-lg font-bold mb-2">📥 นำเข้าจาก Excel</h2>
       <p className="text-sm text-zinc-500 mb-4">
         ใช้เทมเพลท{" "}
@@ -110,7 +110,7 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
               setFile(e.target.files?.[0] ?? null)
               setPreview(null)
             }}
-            className="w-full text-sm mt-1"
+            className="input-touch mt-1 w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-2"
           />
         </div>
         <button
@@ -118,7 +118,7 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
           data-testid="import-preview"
           onClick={handlePreview}
           disabled={!!loading || !file}
-          className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50 disabled:opacity-50"
+          className="btn-secondary disabled:opacity-50"
         >
           {loading === "preview" ? "⏳ กำลังตรวจ..." : "🔍 ตรวจไฟล์"}
         </button>
@@ -127,7 +127,7 @@ export function BatchImportPanel({ batchId, status }: { batchId: number; status:
           data-testid="import-commit"
           onClick={handleImport}
           disabled={!!loading || !preview?.summary.ready}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           {loading === "import" ? "⏳ กำลังนำเข้า..." : "✅ นำเข้าคำสั่งที่พร้อม"}
         </button>

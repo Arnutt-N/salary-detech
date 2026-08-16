@@ -121,6 +121,27 @@ Before UI/UX work, read:
 
 Live mode config: `.impeccable/live/config.json` (Next.js App Router → `app/layout.tsx`).
 
+## Core Working Rules & Safety (กฎกติกาการทำงานและความปลอดภัย)
+
+1. **ห้ามเปิดเผยหรือส่ง Secrets & Sensitive Data เด็ดขาด:**
+   - ห้ามพิมพ์, แสดง, โพสต์ หรือส่ง API keys, Secret keys, Credentials, Passwords, Token หรือข้อมูลสำคัญ/ข้อมูลส่วนบุคคล (PII/Sensitive data) ลงในแชท หรือส่งออกสู่ภายนอกเด็ดขาด
+   - ป้องกันและไม่เปิดเผยค่าจาก `.env` หรือไฟล์ความลับใดๆ
+
+2. **การสื่อสารและการอธิบาย (ภาษาไทยเป็นหลัก สำหรับ Non-Dev & Basic Programming):**
+   - ใช้ภาษาไทยเป็นภาษาหลักในการตอบและอธิบาย
+   - อธิบายให้เข้าใจง่าย เป็นขั้นเป็นตอน ลงรายละเอียดที่ชัดเจน เหมาะสำหรับผู้ใช้งานระดับ Non-developer หรือผู้มีความรู้โปรแกรมมิ่งเบื้องต้น
+   - หลีกเลี่ยงการใช้ศัพท์เทคนิคเฉพาะทางโดยไม่อธิบายที่มาที่ไป
+
+3. **คำแนะนำไวยากรณ์ภาษาอังกฤษ (English Prompting Guidance):**
+   - เมื่อผู้ใช้งานสั่งงานหรือเขียน Prompt เป็นภาษาอังกฤษ ให้ช่วยแนะนำไวยากรณ์ (Grammar) และประโยคภาษาอังกฤษที่ถูกต้องและเป็นธรรมชาติควบคู่ไปด้วย เพื่อช่วยพัฒนาทักษะการ Prompt ภาษาอังกฤษ
+
+4. **Git Workflow & Skill Collections:**
+   - **ก่อนเริ่มงานใหม่หรือ Phase ใหม่ทุกครั้ง:** ต้องสร้าง Git Branch ใหม่เสมอ (`git checkout -b <branch-name>`)
+   - **อ้างอิง Skills จากคอลเลกชันล่าสุด:** เลือกใช้ Skill ที่ตรงกับงานโดยอ้างอิงจากเอกสาร [`.claude/skill-collections-20260815.md`](.claude/skill-collections-20260815.md) เวอร์ชันล่าสุด
+
+5. **การปกป้องไฟล์และโฟลเดอร์ (File Deletion Protection):**
+   - **ห้ามลบไฟล์หรือโฟลเดอร์ใดๆ ในโปรเจกต์เด็ดขาด** หากไม่ได้รับอนุญาตอย่างชัดเจนจากผู้ใช้งาน
+
 ## Avoid
 
 - Duplicating freshness/stale rules outside `lib/freshness.ts`.
@@ -128,3 +149,6 @@ Live mode config: `.impeccable/live/config.json` (Next.js App Router → `app/la
 - Committing `.env` or real secrets.
 - Unnecessary new abstractions, verbose comments, or tests that only assert mocks.
 - Assuming standard Next.js 14/15 APIs — verify against `node_modules/next/dist/docs/` for this repo’s Next 16 version.
+- Deleting files/directories without explicit user approval.
+- Exposing or outputting secrets, credentials, or sensitive tokens in chat.
+

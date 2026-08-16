@@ -83,18 +83,18 @@ export function EditOrderForm({ order, canEdit }: { order: OrderData; canEdit: b
         />
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <button
           type="submit"
           disabled={loading || !canEdit}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           💾 บันทึก
         </button>
         <button
           type="button"
           onClick={() => router.push(`/orders/${order.id}`)}
-          className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50"
+          className="btn-secondary"
         >
           ↩️ ยกเลิก
         </button>

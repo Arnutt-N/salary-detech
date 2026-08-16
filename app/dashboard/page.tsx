@@ -1,10 +1,17 @@
 import { prisma } from "@/lib/prisma"
 import { getDashboardKpis } from "@/lib/dashboard-stats"
 import { STALE_ORDER_WHERE } from "@/lib/freshness"
-import { getOrderTypeLabel } from "@/lib/order-types"
+import {
+  getOrderTypeLabel,
+  getStaleDimensionLabels,
+  STALE_REPORT_ACTION_LABEL,
+} from "@/lib/order-types"
+import { StaleDimensionChip } from "@/components/shared/freshness-badge"
 import { toThaiDate } from "@/lib/date-utils"
 import Link from "next/link"
 import type { RecentOrderWithPerson, StaleOrderWithPerson } from "@/lib/types"
+import { EmptyState } from "@/components/shared/empty-state"
+import { GettingStartedPanel } from "@/components/shared/getting-started-panel"
 
 export default async function DashboardPage() {
   const staleWhere = STALE_ORDER_WHERE
@@ -52,10 +59,14 @@ export default async function DashboardPage() {
 
   const recent = recentOrders as RecentOrderWithPerson[]
   const stale = staleOrders as StaleOrderWithPerson[]
+  const isFreshInstall =
+    totalOrders === 0 && totalPersons === 0 && totalBatches === 0
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8 p-4 sm:p-6">
       <h1 className="text-2xl font-bold">📊 แผงควบคุม</h1>
+
+      {isFreshInstall ? <GettingStartedPanel /> : null}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -64,7 +75,7 @@ export default async function DashboardPage() {
         <Card
           label="ต้องแก้ไข"
           value={staleCount}
-          href="/reports/stale"
+          href={staleCount > 0 ? "#stale" : "/reports/stale"}
           alert={staleCount > 0}
         />
         <Card label="ชุดคำสั่ง" value={totalBatches} href="/batches" />
@@ -77,36 +88,20 @@ export default async function DashboardPage() {
         <Card label="ข้าราชการ" value={totalPersons} href="/employees" />
       </div>
 
-      {/* Quick Actions */}
-      <div className="flex gap-3 flex-wrap">
-        <Link
-          href="/batches"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
-        >
-          📦 จัดการชุดคำสั่ง
-        </Link>
-        <Link
-          href="#stale"
-          className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700"
-        >
-          🚨 ดูคำสั่งที่ต้องแก้ไข
-        </Link>
-        <Link
-          href="/employees"
-          className="bg-zinc-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-zinc-700"
-        >
-          👥 ข้าราชการ
-        </Link>
-      </div>
-
       {/* Recent Activity */}
       <section>
         <h2 className="text-lg font-bold mb-3">🕐 กิจกรรมล่าสุด</h2>
         {recent.length === 0 ? (
-          <p className="text-zinc-400 text-sm">ยังไม่มีกิจกรรม</p>
+          <EmptyState
+            icon="🕐"
+            title="ยังไม่มีกิจกรรมล่าสุด"
+            description="เมื่อมีการสร้างหรือเปิดใช้คำสั่ง รายการจะแสดงที่นี่เพื่อให้ติดตามได้เร็ว"
+            action={{ href: "/orders/new", label: "สร้างคำสั่งใหม่" }}
+            secondaryAction={{ href: "/batches/new", label: "สร้างชุดคำสั่ง" }}
+          />
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="w-full">
+          <div className="overflow-x-auto rounded-lg bg-white shadow">
+            <table className="w-full min-w-[480px]">
               <thead className="bg-zinc-50 border-b">
                 <tr>
                   <th className="text-left p-3 text-sm font-medium">วันที่</th>
@@ -129,7 +124,7 @@ export default async function DashboardPage() {
                     <td className="p-3">
                       <Link
                         href={`/employees/${o.person.id}`}
-                        className="text-blue-600 hover:underline"
+                        className="text-blue-700 hover:underline"
                       >
                         {o.person.firstName} {o.person.lastName}
                       </Link>
@@ -143,35 +138,19 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      {/* Stale Orders */}
-      <section id="stale">
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-lg font-bold">
-            🚨 คำสั่งที่ต้องแก้ไข ({staleCount})
-          </h2>
-          <div className="flex gap-2 items-center">
-            <Link
-              href="/reports/stale"
-              className="text-xs text-blue-600 hover:underline"
-            >
-              ดูรายงานเต็ม →
+      {staleCount > 0 ? (
+        <section id="stale">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-lg font-bold">
+              🚨 คำสั่งที่ต้องแก้ไข ({staleCount})
+            </h2>
+            <Link href="/reports/stale" className="btn-secondary text-sm">
+              {STALE_REPORT_ACTION_LABEL}
             </Link>
-            <a
-              href="/api/reports/stale/export?format=csv"
-              className="text-xs bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700"
-            >
-              📥 CSV
-            </a>
           </div>
-        </div>
 
-        {stale.length === 0 ? (
-          <p className="text-sm text-zinc-400">
-            🎉 ไม่มีคำสั่งที่ต้องแก้ไข
-          </p>
-        ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="w-full">
+          <div className="overflow-x-auto rounded-lg bg-white shadow">
+            <table className="w-full min-w-[480px]">
               <thead className="bg-zinc-50 border-b">
                 <tr>
                   <th className="text-left p-3 text-sm font-medium">ข้าราชการ</th>
@@ -182,12 +161,7 @@ export default async function DashboardPage() {
               </thead>
               <tbody>
                 {stale.map((o) => {
-                  const warnings: string[] = []
-                  if (o.statusSalary === "stale") warnings.push("💰 เงินเดือน")
-                  if (o.statusLevel === "stale") warnings.push("📊 ระดับ")
-                  if (o.statusPosition === "stale") warnings.push("📋 ตำแหน่ง")
-                  if (o.statusType === "stale") warnings.push("🏷️ ประเภท")
-                  if (o.statusOrg === "stale") warnings.push("🏢 สังกัด")
+                  const warnings = getStaleDimensionLabels(o)
                   return (
                     <tr
                       key={o.id}
@@ -196,7 +170,7 @@ export default async function DashboardPage() {
                       <td className="p-3">
                         <Link
                           href={`/employees/${o.person.id}`}
-                          className="text-blue-600 hover:underline"
+                          className="text-blue-700 hover:underline"
                         >
                           {o.person.firstName} {o.person.lastName}
                         </Link>
@@ -210,9 +184,9 @@ export default async function DashboardPage() {
                         {toThaiDate(o.effectiveDate)}
                       </td>
                       <td className="p-3">
-                        <span className="text-red-600 text-xs">
-                          {warnings.join(", ")}
-                        </span>
+                        {warnings.map((label) => (
+                          <StaleDimensionChip key={label} label={label} />
+                        ))}
                       </td>
                     </tr>
                   )
@@ -220,20 +194,17 @@ export default async function DashboardPage() {
               </tbody>
             </table>
           </div>
-        )}
 
-        {staleCount > 30 && (
-          <p className="text-xs text-zinc-400 mt-2">
-            แสดง 30 รายการ จากทั้งหมด {staleCount} รายการ —{" "}
-            <a
-              href="/api/reports/stale/export?format=csv"
-              className="text-blue-600 hover:underline"
-            >
-              ดาวน์โหลดทั้งหมด (CSV)
-            </a>
-          </p>
-        )}
-      </section>
+          {staleCount > 30 ? (
+            <p className="mt-2 text-xs text-zinc-500">
+              แสดง 30 จาก {staleCount.toLocaleString()} รายการ —{" "}
+              <Link href="/reports/stale" className="text-blue-700 hover:underline">
+                {STALE_REPORT_ACTION_LABEL}
+              </Link>
+            </p>
+          ) : null}
+        </section>
+      ) : null}
     </div>
   )
 }
@@ -252,8 +223,10 @@ function Card({
   return (
     <Link
       href={href}
-      className={`rounded-xl p-4 shadow-sm border transition-colors hover:shadow-md ${
-        alert ? "bg-red-50 border-red-200" : "bg-white"
+      className={`rounded-xl border p-4 transition-colors ${
+        alert
+          ? "border-red-200 bg-red-50 hover:border-red-300"
+          : "border-zinc-200 bg-white hover:border-zinc-300"
       }`}
     >
       <div
@@ -261,7 +234,11 @@ function Card({
       >
         {value.toLocaleString()}
       </div>
-      <div className="text-sm text-zinc-500 mt-1">{label}</div>
+      <div
+        className={`mt-1 text-sm ${alert ? "text-red-800" : "text-zinc-600"}`}
+      >
+        {label}
+      </div>
     </Link>
   )
 }

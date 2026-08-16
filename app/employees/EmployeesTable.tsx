@@ -24,8 +24,8 @@ function statusBadge(isActive: boolean, staleCount: number) {
   if (!isActive)
     return { label: "⚪ ไม่ประจำการ", cls: "bg-gray-100 text-gray-600" }
   if (staleCount > 0)
-    return { label: "🔴 มีคำสั่งต้องแก้", cls: "bg-red-50 text-red-700" }
-  return { label: "🟢 ข้อมูลล่าสุด", cls: "bg-green-50 text-green-700" }
+    return { label: "🔴 มีคำสั่งต้องแก้", cls: "bg-red-50 text-red-900 border border-red-200" }
+  return { label: "🟢 ข้อมูลล่าสุด", cls: "bg-green-50 text-green-900 border border-green-200" }
 }
 
 const columnHelper = createColumnHelper<EmployeeRow>()
@@ -80,7 +80,7 @@ const columns = [
       const row = info.row.original
       const badge = statusBadge(row.isActive, info.getValue())
       return (
-        <span className={`text-xs px-2 py-1 rounded-full ${badge.cls}`}>
+        <span className={`inline-flex rounded-full px-2 py-1 text-xs ${badge.cls}`}>
           {badge.label}
         </span>
       )

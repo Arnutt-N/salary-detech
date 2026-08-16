@@ -26,7 +26,7 @@ export function FormField({
   const errorId = error ? `${id}-error` : undefined
   const inputCls =
     inputClassName ??
-    `w-full px-3 py-2 border rounded-lg text-sm mt-1${disabled ? " disabled:bg-zinc-100" : ""}`
+    `w-full input-touch mt-1${disabled ? " disabled:bg-zinc-100" : ""}`
 
   return (
     <div>

@@ -61,7 +61,7 @@ export function EmployeeForm({ mode, person }: EmployeeFormProps) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       <div className="bg-white rounded-xl p-6 shadow-sm border">
         <h2 className="text-lg font-bold mb-4">👤 ข้อมูลส่วนตัว</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField
             id="employee-citizenId"
             label="เลขบัตรประชาชน"
@@ -93,7 +93,7 @@ export function EmployeeForm({ mode, person }: EmployeeFormProps) {
 
       <div className="bg-white rounded-xl p-6 shadow-sm border">
         <h2 className="text-lg font-bold mb-4">📋 ข้อมูลปัจจุบัน (snapshot)</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField id="employee-currentPositionName" label="ตำแหน่ง">
             <input {...register("currentPositionName")} />
           </FormField>
@@ -127,19 +127,19 @@ export function EmployeeForm({ mode, person }: EmployeeFormProps) {
         </div>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <button
           type="submit"
           disabled={loading}
           aria-busy={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           {loading ? "⏳ กำลังบันทึก..." : mode === "create" ? "✅ เพิ่มข้าราชการ" : "💾 บันทึก"}
         </button>
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-4 py-2 border rounded-lg text-sm hover:bg-zinc-50"
+          className="btn-secondary"
         >
           ↩️ ยกเลิก
         </button>

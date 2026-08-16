@@ -62,7 +62,7 @@ export function DataTable<T>({ columns, data }: DataTableProps<T>) {
                     {canSort ? (
                       <button
                         type="button"
-                        className="-m-1 flex w-full items-center rounded px-1 py-0.5 text-left font-medium hover:bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400/60"
+                        className="flex min-h-11 w-full items-center rounded-lg px-2 py-1 text-left font-medium hover:bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400/60"
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         {headerLabel}

@@ -7,7 +7,8 @@ export default auth((req) => {
 
   const isPublic =
     nextUrl.pathname === "/login" ||
-    nextUrl.pathname.startsWith("/api/auth")
+    nextUrl.pathname.startsWith("/api/auth") ||
+    nextUrl.pathname.startsWith("/api/v1/integrations")
 
   if (isPublic) {
     return NextResponse.next()
