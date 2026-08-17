@@ -37,7 +37,7 @@ const columns = [
   columnHelper.accessor("orderNo", {
     header: "เลขที่",
     cell: (info) => (
-      <Link href={`/orders/${info.row.original.id}`} className="text-blue-600 hover:underline font-medium">
+      <Link href={`/orders/${info.row.original.id}`} className="text-blue-700 hover:underline font-medium">
         {info.getValue() || `#${info.row.original.id}`}
       </Link>
     ),
@@ -47,7 +47,7 @@ const columns = [
     cell: (info) => {
       const row = info.row.original
       return row.personId ? (
-        <Link href={`/employees/${row.personId}`} className="text-blue-600 hover:underline">
+        <Link href={`/employees/${row.personId}`} className="text-blue-700 hover:underline">
           {row.personFirstName} {row.personLastName}
         </Link>
       ) : (

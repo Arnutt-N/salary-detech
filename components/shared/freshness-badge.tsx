@@ -43,7 +43,11 @@ type FreshnessFlags = {
 export function FreshnessSummaryBadge({ order }: { order: FreshnessFlags }) {
   if (order.orderStatus === "superseded") {
     return (
-      <span className="inline-flex shrink-0 items-center rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-900">
+      <span
+        role="status"
+        aria-label="ถูกแก้ไข"
+        className="inline-flex shrink-0 items-center rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-900"
+      >
         🔴 ถูกแก้ไข
       </span>
     )

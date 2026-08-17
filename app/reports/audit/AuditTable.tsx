@@ -44,7 +44,7 @@ const columns = [
     cell: (info) => {
       const row = info.row.original
       return (
-        <Link href={`/employees/${row.personId}`} className="text-blue-600 hover:underline">
+        <Link href={`/employees/${row.personId}`} className="text-blue-700 hover:underline">
           {row.personFirstName} {row.personLastName}
         </Link>
       )
@@ -71,7 +71,7 @@ const columns = [
     cell: (info) => {
       const orderId = info.getValue()
       return orderId ? (
-        <Link href={`/orders/${orderId}`} className="text-blue-600 hover:underline text-xs">
+        <Link href={`/orders/${orderId}`} className="text-blue-700 hover:underline text-xs">
           #{orderId}
         </Link>
       ) : (

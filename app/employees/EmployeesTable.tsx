@@ -40,7 +40,7 @@ const columns = [
     cell: (info) => {
       const row = info.row.original
       return (
-        <Link href={`/employees/${row.id}`} className="text-blue-600 hover:underline font-medium">
+        <Link href={`/employees/${row.id}`} className="text-blue-700 hover:underline font-medium">
           {row.nameTitle} {row.firstName} {row.lastName}
         </Link>
       )

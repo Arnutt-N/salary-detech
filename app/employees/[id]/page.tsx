@@ -139,7 +139,7 @@ export default async function EmployeeDetailPage({
             <span
               className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                 person.isActive
-                  ? "bg-green-50 text-green-700 border border-green-200"
+                  ? "bg-green-50 text-green-900 border border-green-200"
                   : "bg-zinc-100 text-zinc-700"
               }`}
             >
