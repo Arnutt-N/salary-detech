@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: 'Noto Sans Thai', 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-noto-sans-thai), 'Noto Sans Thai', 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
   --color-slate-*: initial;
 }
 
