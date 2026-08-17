@@ -1,8 +1,16 @@
 import type { Metadata } from "next"
+import { Noto_Sans_Thai } from "next/font/google"
 import { Toaster } from "sonner"
 import { SessionProvider } from "next-auth/react"
 import { MainNav } from "@/components/shared/main-nav"
 import "./globals.css"
+
+const notoSansThai = Noto_Sans_Thai({
+  subsets: ["thai", "latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-noto-sans-thai",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   title: "Salary Detech — ระบบตรวจสอบคำสั่งข้าราชการ",
@@ -19,15 +27,7 @@ export const dynamic = 'force-dynamic'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="th" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="th" className={notoSansThai.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-gray-50 font-sans antialiased pb-[max(0px,env(safe-area-inset-bottom))]">
         <SessionProvider>
           <a
