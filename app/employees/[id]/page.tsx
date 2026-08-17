@@ -98,7 +98,7 @@ export default async function EmployeeDetailPage({
 
   const field = (label: string, value?: string | number | null) => (
     <div>
-      <p className="text-xs text-zinc-400">{label}</p>
+      <p className="text-xs text-zinc-500">{label}</p>
       <p className="text-sm font-medium mt-0.5">
         {value != null ? String(value) : "—"}
       </p>
@@ -108,7 +108,7 @@ export default async function EmployeeDetailPage({
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-8">
       {/* Breadcrumb */}
-      <div className="text-sm text-zinc-400">
+      <div className="text-sm text-zinc-500">
         <Link href="/employees" className="hover:underline">
           ข้าราชการ
         </Link>
@@ -125,7 +125,7 @@ export default async function EmployeeDetailPage({
             <h1 className="text-2xl font-bold text-balance">
               {person.nameTitle} {person.firstName} {person.lastName}
             </h1>
-            <p className="text-sm text-zinc-400 font-mono mt-1">
+            <p className="text-sm text-zinc-500 font-mono mt-1">
               เลขบัตร: {formatCitizenId(person.citizenId)}
             </p>
           </div>
@@ -137,10 +137,10 @@ export default async function EmployeeDetailPage({
               ✏️ แก้ไข
             </Link>
             <span
-              className={`text-xs px-3 py-1 rounded-full ${
+              className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                 person.isActive
-                  ? "bg-green-50 text-green-700"
-                  : "bg-gray-100 text-gray-600"
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-zinc-100 text-zinc-700"
               }`}
             >
               {person.isActive ? "🟢 ประจำการ" : "⚪ ไม่ประจำการ"}
@@ -205,7 +205,7 @@ export default async function EmployeeDetailPage({
                       {getOrderTypeLabel(o.orderType)}
                       {o.positionName ? ` — ${o.positionName}` : ""}
                     </p>
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-xs text-zinc-500">
                       {toThaiDate(o.effectiveDate)} | {o.orderNo || "ไม่มีเลขที่"}
                     </p>
                   </div>
@@ -283,7 +283,7 @@ export default async function EmployeeDetailPage({
           </div>
         )}
         {person._count.changeLogs > 20 && (
-          <p className="text-xs text-zinc-400 mt-2">
+          <p className="text-xs text-zinc-500 mt-2">
             แสดง 20 รายการล่าสุด จากทั้งหมด {person._count.changeLogs} รายการ
           </p>
         )}

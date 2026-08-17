@@ -41,7 +41,7 @@ export function FormField({
         "aria-describedby": errorId,
       })}
       {error ? (
-        <p id={errorId} role="alert" className="text-xs text-red-500 mt-1">
+        <p id={errorId} role="alert" className="text-xs text-red-700 font-medium mt-1">
           {error}
         </p>
       ) : null}

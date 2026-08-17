@@ -75,7 +75,7 @@ const columns = [
   columnHelper.accessor("orderStatus", {
     header: "สถานะ",
     cell: (info) => (
-      <span className={`text-xs px-2 py-1 rounded-full ${info.getValue() === "superseded" ? "bg-zinc-100 text-zinc-800" : "bg-red-50 text-red-900"}`}>
+      <span className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${info.getValue() === "superseded" ? "bg-zinc-100 text-zinc-800" : "bg-red-50 text-red-900 border border-red-200"}`}>
         {getOrderStatusLabel(info.getValue())}
       </span>
     ),

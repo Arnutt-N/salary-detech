@@ -53,7 +53,7 @@ const columns = [
   columnHelper.accessor("changeType", {
     header: "ฟิลด์",
     cell: (info) => (
-      <span className="px-2 py-0.5 bg-zinc-100 rounded text-xs">
+      <span className="inline-flex shrink-0 items-center px-2 py-0.5 bg-zinc-100 rounded text-xs font-medium text-zinc-800">
         {fieldLabel[info.getValue()] || info.getValue()}
       </span>
     ),

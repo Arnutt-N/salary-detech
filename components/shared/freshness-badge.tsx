@@ -43,7 +43,7 @@ type FreshnessFlags = {
 export function FreshnessSummaryBadge({ order }: { order: FreshnessFlags }) {
   if (order.orderStatus === "superseded") {
     return (
-      <span className="inline-flex rounded-full border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-900">
+      <span className="inline-flex shrink-0 items-center rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-900">
         🔴 ถูกแก้ไข
       </span>
     )
@@ -65,7 +65,7 @@ export function FreshnessSummaryBadge({ order }: { order: FreshnessFlags }) {
     <span
       role="status"
       aria-label={getFreshnessFlagPlainLabel(status)}
-      className={`inline-flex rounded-full border px-2 py-1 text-xs ${freshnessSurfaceClass(status)}`}
+      className={`inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${freshnessSurfaceClass(status)}`}
     >
       {getFreshnessFlagLabel(status)}
     </span>

@@ -17,11 +17,14 @@ export type BatchRow = {
   blockerOrders: number
 }
 
-function healthBadge(b: BatchRow): string {
-  if (b.blockerOrders > 0) return "🔴 มีรายการติดขัด"
-  if (b.affectedOrders > 0) return "🟡 มีผลกระทบ"
-  if (b.totalOrders === 0) return "⚪ ยังไม่มีคำสั่ง"
-  return "🟢 ผ่านทั้งหมด"
+function healthBadge(b: BatchRow) {
+  if (b.blockerOrders > 0)
+    return <span className="inline-flex shrink-0 items-center rounded-full bg-red-50 text-red-900 border border-red-200 px-2.5 py-0.5 text-xs font-medium">🔴 มีรายการติดขัด</span>
+  if (b.affectedOrders > 0)
+    return <span className="inline-flex shrink-0 items-center rounded-full bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-0.5 text-xs font-medium">🟡 มีผลกระทบ</span>
+  if (b.totalOrders === 0)
+    return <span className="inline-flex shrink-0 items-center rounded-full bg-zinc-100 text-zinc-700 px-2.5 py-0.5 text-xs font-medium">⚪ ยังไม่มีคำสั่ง</span>
+  return <span className="inline-flex shrink-0 items-center rounded-full bg-green-50 text-green-900 border border-green-200 px-2.5 py-0.5 text-xs font-medium">🟢 ผ่านทั้งหมด</span>
 }
 
 const columnHelper = createColumnHelper<BatchRow>()
@@ -49,15 +52,15 @@ const columns = [
   }),
   columnHelper.accessor("cleanOrders", {
     header: "ผ่าน",
-    cell: (info) => <span className="text-center block text-green-600">{info.getValue()}</span>,
+    cell: (info) => <span className="text-center block text-green-700 font-medium">{info.getValue()}</span>,
   }),
   columnHelper.accessor("affectedOrders", {
     header: "ต้องแก้",
-    cell: (info) => <span className="text-center block text-amber-600">{info.getValue()}</span>,
+    cell: (info) => <span className="text-center block text-amber-800 font-medium">{info.getValue()}</span>,
   }),
   columnHelper.accessor("blockerOrders", {
     header: "ติดขัด",
-    cell: (info) => <span className="text-center block text-red-600">{info.getValue()}</span>,
+    cell: (info) => <span className="text-center block text-red-700 font-medium">{info.getValue()}</span>,
   }),
   columnHelper.accessor("totalOrders", {
     id: "health",
