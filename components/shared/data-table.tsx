@@ -82,7 +82,7 @@ export function DataTable<T>({ columns, data }: DataTableProps<T>) {
         <tbody>
           {table.getRowModel().rows.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="p-6 text-center text-zinc-400">
+              <td colSpan={columns.length} className="p-6 text-center text-zinc-500">
                 ไม่มีข้อมูล
               </td>
             </tr>

@@ -22,7 +22,7 @@ export type EmployeeRow = {
 
 function statusBadge(isActive: boolean, staleCount: number) {
   if (!isActive)
-    return { label: "⚪ ไม่ประจำการ", cls: "bg-gray-100 text-gray-600" }
+    return { label: "⚪ ไม่ประจำการ", cls: "bg-zinc-100 text-zinc-700" }
   if (staleCount > 0)
     return { label: "🔴 มีคำสั่งต้องแก้", cls: "bg-red-50 text-red-900 border border-red-200" }
   return { label: "🟢 ข้อมูลล่าสุด", cls: "bg-green-50 text-green-900 border border-green-200" }
@@ -33,14 +33,14 @@ const columnHelper = createColumnHelper<EmployeeRow>()
 const columns = [
   columnHelper.accessor("id", {
     header: "#",
-    cell: (info) => <span className="font-mono text-zinc-400">{info.getValue()}</span>,
+    cell: (info) => <span className="font-mono text-zinc-500">{info.getValue()}</span>,
   }),
   columnHelper.accessor("firstName", {
     header: "ชื่อ-สกุล",
     cell: (info) => {
       const row = info.row.original
       return (
-        <Link href={`/employees/${row.id}`} className="text-blue-600 hover:underline font-medium">
+        <Link href={`/employees/${row.id}`} className="text-blue-700 hover:underline font-medium">
           {row.nameTitle} {row.firstName} {row.lastName}
         </Link>
       )
@@ -59,7 +59,7 @@ const columns = [
       return (
         <>
           {info.getValue() || "—"}
-          <div className="text-xs text-zinc-400">
+          <div className="text-xs text-zinc-500">
             {row.currentPositionType} / {row.currentPositionLevel}
           </div>
         </>
@@ -80,7 +80,7 @@ const columns = [
       const row = info.row.original
       const badge = statusBadge(row.isActive, info.getValue())
       return (
-        <span className={`inline-flex rounded-full px-2 py-1 text-xs ${badge.cls}`}>
+        <span className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.cls}`}>
           {badge.label}
         </span>
       )

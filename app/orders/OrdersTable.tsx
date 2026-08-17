@@ -28,7 +28,7 @@ const columnHelper = createColumnHelper<OrderRow>()
 const columns = [
   columnHelper.accessor("id", {
     header: "#",
-    cell: (info) => <span className="font-mono text-zinc-400">{info.getValue()}</span>,
+    cell: (info) => <span className="font-mono text-zinc-500">{info.getValue()}</span>,
   }),
   columnHelper.accessor("orderType", {
     header: "ประเภท",
@@ -37,7 +37,7 @@ const columns = [
   columnHelper.accessor("orderNo", {
     header: "เลขที่",
     cell: (info) => (
-      <Link href={`/orders/${info.row.original.id}`} className="text-blue-600 hover:underline font-medium">
+      <Link href={`/orders/${info.row.original.id}`} className="text-blue-700 hover:underline font-medium">
         {info.getValue() || `#${info.row.original.id}`}
       </Link>
     ),
@@ -47,7 +47,7 @@ const columns = [
     cell: (info) => {
       const row = info.row.original
       return row.personId ? (
-        <Link href={`/employees/${row.personId}`} className="text-blue-600 hover:underline">
+        <Link href={`/employees/${row.personId}`} className="text-blue-700 hover:underline">
           {row.personFirstName} {row.personLastName}
         </Link>
       ) : (
@@ -62,7 +62,7 @@ const columns = [
   columnHelper.accessor("orderStatus", {
     header: "สถานะ",
     cell: (info) => (
-      <span className="text-xs px-2 py-1 rounded-full bg-zinc-100">
+      <span className="inline-flex shrink-0 items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-800">
         {getOrderStatusLabel(info.getValue())}
       </span>
     ),

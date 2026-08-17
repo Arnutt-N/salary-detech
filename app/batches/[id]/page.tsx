@@ -49,7 +49,7 @@ export default async function BatchDetailPage({
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-6">
       {/* Breadcrumb */}
-      <div className="text-sm text-zinc-600 mb-4">
+      <div className="text-sm text-zinc-500 mb-4">
         <Link href="/batches" className="hover:underline">ชุดคำสั่ง</Link>
         {" / "}
         <span className="text-zinc-700">{batch.batchNo}</span>
@@ -60,9 +60,9 @@ export default async function BatchDetailPage({
 
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
         <Stat label="ทั้งหมด" value={batch.totalOrders} />
-        <Stat label="✅ ผ่าน" value={batch.cleanOrders} color="text-green-600" />
-        <Stat label="⚠️ กระทบ" value={batch.affectedOrders} color="text-amber-600" />
-        <Stat label="🔴 ติดขัด" value={batch.blockerOrders} color="text-red-600" />
+        <Stat label="✅ ผ่าน" value={batch.cleanOrders} color="text-green-700" />
+        <Stat label="⚠️ กระทบ" value={batch.affectedOrders} color="text-amber-800" />
+        <Stat label="🔴 ติดขัด" value={batch.blockerOrders} color="text-red-700" />
         <Stat label="🔗 กระทบต่อเนื่อง" value={batch.cascadeTotal} />
         <Stat label="สถานะ" value={getBatchStatusLabel(batch.status)} testId="batch-status" />
       </div>
