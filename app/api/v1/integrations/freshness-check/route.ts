@@ -2,28 +2,34 @@ import { NextResponse } from "next/server"
 import type { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { isOrderStale } from "@/lib/freshness"
+import { requireIntegrationSecret } from "@/lib/integration-auth"
+import { freshnessCheckSchema } from "@/lib/validation/integration-schema"
 
 /**
  * POST /api/v1/integrations/freshness-check
  * Check freshness status of orders for external Payroll / ERP systems
  */
 export async function POST(req: Request) {
+  const unauthorized = requireIntegrationSecret(req)
+  if (unauthorized) return unauthorized
+
   try {
     const body = await req.json()
-    const { orderIds, employeeIds } = body
-
-    if (!orderIds && !employeeIds) {
+    const parsed = freshnessCheckSchema.safeParse(body)
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, message: "Provide orderIds (array) or employeeIds (array)" },
+        { success: false, message: parsed.error.issues[0]?.message ?? "Invalid request body" },
         { status: 400 }
       )
     }
 
+    const { orderIds, employeeIds } = parsed.data
+
     const whereClause: Prisma.OrderWhereInput = { orderStatus: "active" }
-    if (orderIds && Array.isArray(orderIds)) {
-      whereClause.id = { in: orderIds.map((id: unknown) => Number(id)) }
-    } else if (employeeIds && Array.isArray(employeeIds)) {
-      whereClause.employeeId = { in: employeeIds.map((id: unknown) => Number(id)) }
+    if (orderIds?.length) {
+      whereClause.id = { in: orderIds }
+    } else if (employeeIds?.length) {
+      whereClause.employeeId = { in: employeeIds }
     }
 
     const orders = await prisma.order.findMany({

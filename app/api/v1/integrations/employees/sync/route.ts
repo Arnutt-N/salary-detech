@@ -1,18 +1,34 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { mapDpisPersonToModel, type DpisPersonRaw } from "@/lib/dpis-mapping"
+import { requireIntegrationSecret } from "@/lib/integration-auth"
+import {
+  dpisPersonRecordSchema,
+  MAX_SYNC_RECORDS,
+  zodIssueSummary,
+} from "@/lib/validation/integration-schema"
 
 /**
  * POST /api/v1/integrations/employees/sync
  * Upsert employees from external HR / DPIS database
  */
 export async function POST(req: Request) {
+  const unauthorized = requireIntegrationSecret(req)
+  if (unauthorized) return unauthorized
+
   try {
     const body = await req.json()
-    const records: DpisPersonRaw[] = Array.isArray(body) ? body : [body]
+    const records: unknown[] = Array.isArray(body) ? body : [body]
 
     if (records.length === 0) {
       return NextResponse.json({ success: false, message: "No employee records provided" }, { status: 400 })
+    }
+
+    if (records.length > MAX_SYNC_RECORDS) {
+      return NextResponse.json(
+        { success: false, message: `Too many records (${records.length}). Limit is ${MAX_SYNC_RECORDS} per request.` },
+        { status: 413 }
+      )
     }
 
     const results = {
@@ -24,12 +40,21 @@ export async function POST(req: Request) {
 
     for (const raw of records) {
       try {
-        if (!raw.per_cardno && !raw.per_name) {
+        const parsed = dpisPersonRecordSchema.safeParse(raw)
+        if (!parsed.success) {
+          results.errors.push({
+            citizenId: (raw as DpisPersonRaw)?.per_cardno,
+            error: `Invalid record: ${zodIssueSummary(parsed.error)}`,
+          })
+          continue
+        }
+
+        if (!parsed.data.per_cardno && !parsed.data.per_name) {
           results.errors.push({ error: "Missing required citizen ID or name" })
           continue
         }
 
-        const personData = mapDpisPersonToModel(raw)
+        const personData = mapDpisPersonToModel(raw as DpisPersonRaw)
 
         if (personData.citizenId) {
           const existing = await prisma.person.findFirst({
@@ -56,7 +81,7 @@ export async function POST(req: Request) {
         }
       } catch (err: unknown) {
         results.errors.push({
-          citizenId: raw.per_cardno,
+          citizenId: (raw as DpisPersonRaw)?.per_cardno,
           error: err instanceof Error ? err.message : "Failed to process record",
         })
       }
