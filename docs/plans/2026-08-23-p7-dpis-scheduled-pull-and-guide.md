@@ -65,7 +65,7 @@
 - `ingestOrders(records: unknown[]): SyncResult` — zod → resolve person → **dedupe ก่อน create** → `validateOrderFreshness` + `cascadeStaleCheck` (เดิมจาก orders/sync)
 - **กติกา dedupe (ระบุชัดเจน — ต้นทาง DPIS คือความจริง):** ค้น `findFirst({ where: { orderNo, employeeId } })` เมื่อ orderNo ไม่ใช่ null:
   - **ซ้ำ + ข้อมูล snapshot ไม่เปลี่ยน** → ข้าม นับใน `results.skipped`
-  - **ซ้ำ + ข้อมูลเปลี่ยน** → `update` ฟิลด์ snapshot ให้ตรงต้นทาง + เรียก `validateOrderFreshness` ใหม่ + นับใน `results.updated`
+  - **ซ้ำ + ข้อมูลเปลี่ยน** → `update` ฟิลด์ snapshot ให้ตรงต้นทาง + เรียก `validateOrderFreshness` + `cascadeStaleCheck` ใหม่ (เหมือนเส้นทาง create) + นับใน `results.updated`
   - **orderNo เป็น null** → ไม่ dedupe (สร้างตามเดิม) — เหตุผล: ไม่มีคีย์ และนี่คือช่องทาง push แบบ one-off
 
 ### Task 1.2: Routes เรียก service
