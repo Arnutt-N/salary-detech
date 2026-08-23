@@ -267,10 +267,10 @@ export async function isOrderStale(order: {
   if (order.bureau || order.division || order.department || order.ministry) {
     const current = await getCurrentOrg(order.employeeId, order.id)
     if (
-      (order.bureau && order.bureau !== current.bureau) ||
-      (order.division && order.division !== current.division) ||
-      (order.department && order.department !== current.department) ||
-      (order.ministry && order.ministry !== current.ministry)
+      (order.bureau && current.bureau && order.bureau !== current.bureau) ||
+      (order.division && current.division && order.division !== current.division) ||
+      (order.department && current.department && order.department !== current.department) ||
+      (order.ministry && current.ministry && order.ministry !== current.ministry)
     ) {
       result.statusOrg = "stale"
     }

@@ -200,10 +200,9 @@ describe("POST /api/v1/integrations/orders/sync", () => {
     assert.strictEqual(staleOrder.orderStatus, "active")
   })
 
-  // Documents current engine behavior: the org check (unlike level/position/type)
-  // has no guard when the employee has no org change history, so an order that
-  // carries any org field is flagged statusOrg=stale until a change log exists.
-  test("flags org stale when an order carries org fields but the employee has no org change history", async () => {
+  // Mirrors checks 2–4: no org change history means there is nothing to
+  // contradict, so org fields must stay latest (scenario C4 spirit).
+  test("keeps org latest when an order carries org fields but the employee has no org change history", async () => {
     const res = await syncOrders(
       postJson({
         com_no: "DPIS-ORD-ORG",
@@ -219,13 +218,13 @@ describe("POST /api/v1/integrations/orders/sync", () => {
 
     assert.strictEqual(res.status, 200)
     assert.strictEqual(body.data.created, 1)
-    assert.strictEqual(body.data.staleFound, 1)
+    assert.strictEqual(body.data.staleFound, 0)
 
     const order = await prisma.order.findFirst({
       where: { orderNo: "DPIS-ORD-ORG" },
     })
     assert.ok(order)
-    assert.strictEqual(order.statusOrg, "stale")
+    assert.strictEqual(order.statusOrg, "latest")
     assert.strictEqual(order.statusSalary, "latest")
   })
 })

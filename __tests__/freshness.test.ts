@@ -192,6 +192,44 @@ describe("isOrderStale", () => {
     const result = await isOrderStale(order)
     assert.strictEqual(result.overallStatus, "latest")
   })
+
+  test("keeps org latest when an order carries org fields but the employee has no org change history", async () => {
+    const newcomer = await prisma.person.create({
+      data: { firstName: "ใหม่", lastName: "ไร้ประวัติสังกัด", isActive: true },
+    })
+    const order = await prisma.order.create({
+      data: {
+        employeeId: newcomer.id,
+        orderType: "transfer",
+        issueDate: "2569-03-01",
+        effectiveDate: "2569-03-01",
+        salaryAsOfDate: "2569-03-01",
+        bureau: "กองนโยบายและแผน",
+        ministry: "กระทรวงทดสอบ",
+      },
+    })
+
+    const result = await isOrderStale(order)
+    assert.strictEqual(result.statusOrg, "latest")
+    assert.strictEqual(result.overallStatus, "latest")
+  })
+
+  test("returns statusOrg stale when org fields contradict the change log", async () => {
+    // Seeded change log current bureau is "กองการเจ้าหน้าที่"
+    const order = await prisma.order.create({
+      data: {
+        employeeId: personId,
+        orderType: "transfer",
+        issueDate: "2569-01-15",
+        effectiveDate: "2569-02-01",
+        salaryAsOfDate: "2569-02-01",
+        bureau: "กองคลังอื่น",
+      },
+    })
+
+    const result = await isOrderStale(order)
+    assert.strictEqual(result.statusOrg, "stale")
+  })
 })
 
 describe("getMaxSalaryEffectiveDate", () => {
