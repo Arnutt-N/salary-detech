@@ -12,6 +12,7 @@ const files = [
   path.join(__dirname, "api", "employees.test.ts"),
   path.join(__dirname, "api", "batches.test.ts"),
   path.join(__dirname, "api", "dashboard.test.ts"),
+  path.join(__dirname, "api", "integrations.test.ts"),
 ]
 
 const stream = run({ files, concurrency: false })
