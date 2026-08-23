@@ -11,3 +11,6 @@ e2e/.runtime.json
 secrets/
 
 project-log-md/
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/

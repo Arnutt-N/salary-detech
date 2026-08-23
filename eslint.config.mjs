@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // graft tool shims (CommonJS by design)
+    ".claude/helpers/**",
   ]),
 ]);
 
