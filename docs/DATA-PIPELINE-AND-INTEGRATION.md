@@ -61,11 +61,15 @@ flowchart TD
 3. `vw_dpis_salary_detech_salary_history`: สกัดประวัติการเลื่อนเงินเดือนย้อนหลัง
 
 ### ช่องทางที่ 2: REST API สำหรับการรับข้อมูลอัตโนมัติ (Automated API Ingestion)
+
+> **สิ่งที่ต้องแนบทุกคำขอ:** Header `Authorization: Bearer <INTEGRATION_SECRET>` (ตั้งค่าใน env ของระบบ) — ถ้าไม่แนบหรือค่าไม่ถูกต้องจะได้รับ `401` และถ้าฝั่งเซิร์ฟเวอร์ยังไม่ได้ตั้ง `INTEGRATION_SECRET` จะปฏิเสธทุกคำขอด้วย `503` (fail-closed)
+
 - **Sync ข้อมูลบุคคล:** `POST /api/v1/integrations/employees/sync`
-  - รองรับการส่งข้อมูลข้าราชการทั้งแบบรายบุคคล หรือแบบ Array
+  - รองรับการส่งข้อมูลข้าราชการทั้งแบบรายบุคคล หรือแบบ Array (สูงสุด 1,000 รายการต่อคำขอ)
   - ทำการ Upsert อัตโนมัติตามเลขประจำตัวประชาชน (`citizenId`)
+  - ตรวจชนิดข้อมูลรายแถวด้วย Zod — แถวที่ผิดรูปแบบถูกรายงานเป็น error ของแถวนั้น ไม่กระทบทั้งชุด
 - **Sync ข้อมูลคำสั่ง:** `POST /api/v1/integrations/orders/sync`
-  - รับข้อมูลคำสั่งทางทะเบียนประวัติ
+  - รับข้อมูลคำสั่งทางทะเบียนประวัติ (สูงสุด 1,000 รายการต่อคำขอ)
   - ทำการค้นหา `employeeId` จาก `citizenId` ให้อัตโนมัติ
   - เรียกใช้ `validateOrderFreshness` และ `cascadeStaleCheck` แบบ Realtime ทันทีที่บันทึก
 
@@ -143,6 +147,7 @@ flowchart TD
 ---
 
 ## 5. มาตรการความปลอดภัยและการจัดการข้อผิดพลาด (Security & Resilience)
-1. **Machine-to-Machine Auth Gate:** รองรับการเปิดทางผ่าน [`app/proxy.ts`](file:///D:/00%20hrProject/salary-detech/app/proxy.ts) พร้อมตรวจสอบ API Keys ใน Header (`x-api-key`)
-2. **Transaction Isolation:** การ Ingest ข้อมูลแบบ Batch มีระบบ Error Collection รายบรรทัด ทำให้คำสั่งที่ถูกต้องสามารถบันทึกได้โดยไม่ถูกยกเลิกทั้งชุด (Partial Batch Ingestion with Detailed Error Reporting)
-3. **No PII Leakage:** ไม่มีบันทึกข้อมูลส่วนบุคคลสำคัญลงใน System Log ทั่วไป
+1. **Machine-to-Machine Auth Gate:** ทุก endpoint ของ `/api/v1/integrations/*` ตรวจ `Authorization: Bearer <INTEGRATION_SECRET>` ผ่าน `lib/integration-auth.ts` แบบ **fail-closed** — ถ้าไม่ได้ตั้ง `INTEGRATION_SECRET` ใน env จะปฏิเสธทุกคำขอ (`503`) ไม่ปล่อยผ่าน และเทียบรหัสแบบ timing-safe
+2. **Input Validation & Limits:** ตรวจข้อมูลรายแถวด้วย Zod (`lib/validation/integration-schema.ts`) และจำกัดขนาด batch สูงสุด 1,000 รายการต่อคำขอ (`413` เมื่อเกิน)
+3. **Transaction Isolation:** การ Ingest ข้อมูลแบบ Batch มีระบบ Error Collection รายบรรทัด ทำให้คำสั่งที่ถูกต้องสามารถบันทึกได้โดยไม่ถูกยกเลิกทั้งชุด (Partial Batch Ingestion with Detailed Error Reporting)
+4. **No PII Leakage:** ไม่มีบันทึกข้อมูลส่วนบุคคลสำคัญลงใน System Log ทั่วไป

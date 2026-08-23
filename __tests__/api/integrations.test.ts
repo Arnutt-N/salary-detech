@@ -8,18 +8,80 @@ import { POST as freshnessCheck } from "../../app/api/v1/integrations/freshness-
 
 let personIds: number[]
 
+const INTEGRATION_SECRET = "test-integration-secret"
+
 before(async () => {
+  process.env.INTEGRATION_SECRET = INTEGRATION_SECRET
   const data = await seedApiDb()
   personIds = data.personIds
 })
 
-function postJson(body: unknown) {
+function postJson(body: unknown, authorization: string | null = `Bearer ${INTEGRATION_SECRET}`) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" }
+  if (authorization !== null) headers.Authorization = authorization
   return new Request("http://localhost/api/v1/integrations", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(body),
   })
 }
+
+describe("integration auth & limits", () => {
+  test("rejects a request without an Authorization header (401)", async () => {
+    const res = await syncEmployees(postJson({ per_cardno: "X", per_name: "x" }, null))
+    assert.strictEqual(res.status, 401)
+    const body = await res.json()
+    assert.strictEqual(body.success, false)
+  })
+
+  test("rejects a wrong Bearer secret (401)", async () => {
+    const res = await syncOrders(postJson({ com_no: "X" }, "Bearer wrong-secret"))
+    assert.strictEqual(res.status, 401)
+  })
+
+  test("rejects every request when INTEGRATION_SECRET is not configured (503, fail-closed)", async () => {
+    const saved = process.env.INTEGRATION_SECRET
+    delete process.env.INTEGRATION_SECRET
+    try {
+      const res = await freshnessCheck(postJson({ orderIds: [1] }))
+      assert.strictEqual(res.status, 503)
+      const body = await res.json()
+      assert.strictEqual(body.success, false)
+    } finally {
+      process.env.INTEGRATION_SECRET = saved
+    }
+  })
+
+  test("rejects a batch larger than the record cap (413)", async () => {
+    const res = await syncEmployees(postJson(Array.from({ length: 1001 }, () => ({}))))
+    assert.strictEqual(res.status, 413)
+    const body = await res.json()
+    assert.ok(body.message.includes("Too many records"))
+  })
+
+  test("collects a per-record zod error for mistyped DPIS fields", async () => {
+    const res = await syncEmployees(
+      postJson([
+        { per_cardno: 12345, per_name: "ตัวเลขผิดชนิด" }, // per_cardno must be a string
+        { per_cardno: "7000000000099", per_name: "ถูกต้อง", per_surname: "ปกติ" },
+      ])
+    )
+    const body = await res.json()
+
+    assert.strictEqual(res.status, 200)
+    assert.strictEqual(body.data.created, 1)
+    assert.strictEqual(body.data.errors.length, 1)
+    assert.ok(body.data.errors[0].error.includes("Invalid record"))
+    assert.ok(body.data.errors[0].error.includes("per_cardno"))
+  })
+
+  test("rejects a freshness-check body with wrong shape (400)", async () => {
+    const res = await freshnessCheck(postJson({ orderIds: "not-an-array" }))
+    assert.strictEqual(res.status, 400)
+    const body = await res.json()
+    assert.strictEqual(body.success, false)
+  })
+})
 
 describe("POST /api/v1/integrations/employees/sync", () => {
   test("creates a person from a single DPIS record", async () => {

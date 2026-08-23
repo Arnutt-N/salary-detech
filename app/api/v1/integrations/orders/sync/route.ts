@@ -2,18 +2,34 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { mapDpisOrderToModel, type DpisOrderRaw } from "@/lib/dpis-mapping"
 import { validateOrderFreshness, cascadeStaleCheck } from "@/lib/freshness"
+import { requireIntegrationSecret } from "@/lib/integration-auth"
+import {
+  dpisOrderRecordSchema,
+  MAX_SYNC_RECORDS,
+  zodIssueSummary,
+} from "@/lib/validation/integration-schema"
 
 /**
  * POST /api/v1/integrations/orders/sync
  * Ingest and validate orders from DPIS / external HR systems
  */
 export async function POST(req: Request) {
+  const unauthorized = requireIntegrationSecret(req)
+  if (unauthorized) return unauthorized
+
   try {
     const body = await req.json()
-    const records: DpisOrderRaw[] = Array.isArray(body) ? body : [body]
+    const records: unknown[] = Array.isArray(body) ? body : [body]
 
     if (records.length === 0) {
       return NextResponse.json({ success: false, message: "No order records provided" }, { status: 400 })
+    }
+
+    if (records.length > MAX_SYNC_RECORDS) {
+      return NextResponse.json(
+        { success: false, message: `Too many records (${records.length}). Limit is ${MAX_SYNC_RECORDS} per request.` },
+        { status: 413 }
+      )
     }
 
     const results = {
@@ -26,12 +42,23 @@ export async function POST(req: Request) {
 
     for (const raw of records) {
       try {
-        let employeeId = raw.employee_id
+        const parsed = dpisOrderRecordSchema.safeParse(raw)
+        if (!parsed.success) {
+          results.errors.push({
+            comNo: (raw as DpisOrderRaw)?.com_no,
+            citizenId: (raw as DpisOrderRaw)?.per_cardno,
+            error: `Invalid record: ${zodIssueSummary(parsed.error)}`,
+          })
+          continue
+        }
+
+        const record = parsed.data
+        let employeeId = record.employee_id
 
         // Lookup employee by citizenId if employeeId not directly supplied
-        if (!employeeId && raw.per_cardno) {
+        if (!employeeId && record.per_cardno) {
           const person = await prisma.person.findFirst({
-            where: { citizenId: raw.per_cardno.trim() },
+            where: { citizenId: record.per_cardno.trim() },
             select: { id: true },
           })
           if (person) employeeId = person.id
@@ -39,14 +66,14 @@ export async function POST(req: Request) {
 
         if (!employeeId) {
           results.errors.push({
-            comNo: raw.com_no,
-            citizenId: raw.per_cardno,
+            comNo: record.com_no ?? undefined,
+            citizenId: record.per_cardno ?? undefined,
             error: "Person not found in database. Please sync employee first.",
           })
           continue
         }
 
-        const orderData = mapDpisOrderToModel(raw, employeeId)
+        const orderData = mapDpisOrderToModel(raw as DpisOrderRaw, employeeId)
         const newOrder = await prisma.order.create({
           data: orderData,
         })
@@ -64,8 +91,8 @@ export async function POST(req: Request) {
         results.created++
       } catch (err: unknown) {
         results.errors.push({
-          comNo: raw.com_no,
-          citizenId: raw.per_cardno,
+          comNo: (raw as DpisOrderRaw)?.com_no,
+          citizenId: (raw as DpisOrderRaw)?.per_cardno,
           error: err instanceof Error ? err.message : "Failed to import order",
         })
       }
