@@ -289,6 +289,78 @@ describe("POST /api/v1/integrations/orders/sync", () => {
     assert.strictEqual(order.statusOrg, "latest")
     assert.strictEqual(order.statusSalary, "latest")
   })
+
+  // Dedupe by (orderNo, employeeId): DPIS is the source of truth, so re-pushing
+  // an identical order must not create a second row (P7 plan Task 1.1).
+  test("skips a re-pushed identical order instead of creating a duplicate", async () => {
+    const payload = {
+      com_no: "DPIS-DUP-001",
+      com_date: "2569-05-01",
+      cmd_date: "2569-05-01",
+      mov_code: "20100",
+      cmd_salary: 24000,
+      per_cardno: "1100200300404",
+    }
+
+    const first = await syncOrders(postJson(payload))
+    const firstBody = await first.json()
+    assert.strictEqual(firstBody.data.created, 1)
+    assert.strictEqual(firstBody.data.skipped, 0)
+    assert.strictEqual(firstBody.data.updated, 0)
+
+    const second = await syncOrders(postJson(payload))
+    const secondBody = await second.json()
+    assert.strictEqual(secondBody.data.created, 0)
+    assert.strictEqual(secondBody.data.skipped, 1)
+    assert.strictEqual(secondBody.data.updated, 0)
+
+    const count = await prisma.order.count({ where: { orderNo: "DPIS-DUP-001" } })
+    assert.strictEqual(count, 1)
+  })
+
+  test("updates a re-pushed order when its snapshot changed and re-validates freshness", async () => {
+    const base = {
+      com_no: "DPIS-DUP-002",
+      com_date: "2569-05-01",
+      cmd_date: "2569-05-01",
+      mov_code: "20100",
+      cmd_salary: 24000,
+      per_cardno: "1100200300405",
+    }
+
+    await syncOrders(postJson(base))
+    const res = await syncOrders(postJson({ ...base, cmd_salary: 28000 }))
+    const body = await res.json()
+
+    assert.strictEqual(body.data.created, 0)
+    assert.strictEqual(body.data.skipped, 0)
+    assert.strictEqual(body.data.updated, 1)
+    assert.strictEqual(body.data.errors.length, 0)
+
+    const order = await prisma.order.findFirst({
+      where: { orderNo: "DPIS-DUP-002" },
+    })
+    assert.ok(order)
+    assert.strictEqual(order.salary, 28000)
+    // Freshness was re-evaluated on the update path (only salary order of person 5)
+    assert.strictEqual(order.statusSalary, "latest")
+  })
+
+  test("does not dedupe orders without an orderNo (no key)", async () => {
+    const payload = {
+      cmd_date: "2569-05-01",
+      mov_code: "20100",
+      cmd_salary: 21000,
+      per_cardno: "1100200300404",
+    }
+
+    const res = await syncOrders(postJson([payload, payload]))
+    const body = await res.json()
+
+    assert.strictEqual(body.data.created, 2)
+    assert.strictEqual(body.data.skipped, 0)
+    assert.strictEqual(body.data.updated, 0)
+  })
 })
 
 describe("POST /api/v1/integrations/freshness-check", () => {
