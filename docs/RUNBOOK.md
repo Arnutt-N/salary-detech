@@ -63,6 +63,7 @@
 | `ADMIN_USERNAME` | Login username | กำหนดเอง |
 | `ADMIN_PASSWORD` | Login password | กำหนดเอง (ห้าม hardcode) |
 | `CRON_SECRET` | Protect cron endpoints | `openssl rand -base64 32` |
+| `INTEGRATION_SECRET` | Bearer token ของ `/api/v1/integrations/*` (DPIS/payroll) — **fail-closed: ไม่ตั้ง = endpoints ตอบ `503` ทั้งหมด** ต้องตั้งก่อน deploy production และส่งรหัสให้ฝั่ง DPIS ผ่านช่องทางปลอดภัย | `openssl rand -base64 32` |
 | `SENTRY_DSN` | Error tracking | ได้จาก sentry.io |
 | `NODE_VERSION` | Node.js version | `20` |
 

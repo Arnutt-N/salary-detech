@@ -45,6 +45,7 @@ npx tsx prisma/seed.ts   # optional demo data only
 | `ADMIN_USERNAME` | Yes | Login username |
 | `ADMIN_PASSWORD` | Yes | Strong password — never commit |
 | `CRON_SECRET` | Yes | Protects `/api/cron/cleanup-previews` |
+| `INTEGRATION_SECRET` | Yes | Bearer auth for `/api/v1/integrations/*` (DPIS/payroll). **Fail-closed: unset = endpoints return `503`** — must be set before production deploy; share with the DPIS team over a secure channel |
 | `SENTRY_DSN` | Optional | Error tracking |
 | `DATABASE_URL` | Optional | Same as Turso URL if using Prisma CLI in build |
 
@@ -55,7 +56,12 @@ npx tsx prisma/seed.ts   # optional demo data only
 1. Open `/login` — sign in with `ADMIN_USERNAME` / `ADMIN_PASSWORD`.
 2. Dashboard loads without 500 errors.
 3. Create draft batch → import `docs/templates/import-sample-seed.xlsx` → Preview → Approve.
-4. (Optional) Trigger cron manually:
+4. Integration endpoints answer `401` without a token (proves `INTEGRATION_SECRET` is set — `503` means it is missing):
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}\n" -X POST https://YOUR_DOMAIN/api/v1/integrations/freshness-check \
+     -H "Content-Type: application/json" -d '{"orderIds":[1]}'
+   ```
+5. (Optional) Trigger cron manually:
    ```bash
    curl -H "Authorization: Bearer $CRON_SECRET" \
      https://YOUR_DOMAIN/api/cron/cleanup-previews
@@ -79,5 +85,6 @@ npm run test:e2e:full
 | DB connection error | Check `TURSO_*` vars; token not expired |
 | Build fails on Prisma | Ensure `postinstall` runs; `DATABASE_URL` or Turso URL set for generate |
 | Cron 401 | Set `CRON_SECRET`; Vercel sends `Authorization: Bearer …` |
+| Integration APIs return `503` | `INTEGRATION_SECRET` not set in Vercel env — set it and redeploy (fail-closed by design) |
 
 See also `docs/RUNBOOK.md` for operator-facing usage.
