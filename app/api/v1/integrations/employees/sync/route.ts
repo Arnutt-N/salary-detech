@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { mapDpisPersonToModel, type DpisPersonRaw } from "@/lib/dpis-mapping"
+import { ingestPersons } from "@/lib/dpis-ingest"
 import { requireIntegrationSecret } from "@/lib/integration-auth"
-import {
-  dpisPersonRecordSchema,
-  MAX_SYNC_RECORDS,
-  zodIssueSummary,
-} from "@/lib/validation/integration-schema"
+import { MAX_SYNC_RECORDS } from "@/lib/validation/integration-schema"
 
 /**
  * POST /api/v1/integrations/employees/sync
@@ -31,66 +26,8 @@ export async function POST(req: Request) {
       )
     }
 
-    const results = {
-      total: records.length,
-      created: 0,
-      updated: 0,
-      errors: [] as { citizenId?: string; error: string }[],
-    }
-
-    for (const raw of records) {
-      try {
-        const parsed = dpisPersonRecordSchema.safeParse(raw)
-        if (!parsed.success) {
-          results.errors.push({
-            citizenId: (raw as DpisPersonRaw)?.per_cardno,
-            error: `Invalid record: ${zodIssueSummary(parsed.error)}`,
-          })
-          continue
-        }
-
-        if (!parsed.data.per_cardno && !parsed.data.per_name) {
-          results.errors.push({ error: "Missing required citizen ID or name" })
-          continue
-        }
-
-        const personData = mapDpisPersonToModel(raw as DpisPersonRaw)
-
-        if (personData.citizenId) {
-          const existing = await prisma.person.findFirst({
-            where: { citizenId: personData.citizenId },
-          })
-
-          if (existing) {
-            await prisma.person.update({
-              where: { id: existing.id },
-              data: personData,
-            })
-            results.updated++
-          } else {
-            await prisma.person.create({
-              data: personData,
-            })
-            results.created++
-          }
-        } else {
-          await prisma.person.create({
-            data: personData,
-          })
-          results.created++
-        }
-      } catch (err: unknown) {
-        results.errors.push({
-          citizenId: (raw as DpisPersonRaw)?.per_cardno,
-          error: err instanceof Error ? err.message : "Failed to process record",
-        })
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: results,
-    })
+    const results = await ingestPersons(records)
+    return NextResponse.json({ success: true, data: results })
   } catch (error: unknown) {
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : "Internal server error" },
